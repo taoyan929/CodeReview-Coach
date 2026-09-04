@@ -2,7 +2,7 @@
 
 CodeReview Coach is a local-first learning product that helps junior developers practise reading, reviewing, explaining, and fixing code—especially code produced with AI assistance.
 
-The project is currently in the **planning / pre-implementation** stage. The product, architecture, data, workflow, quality, and delivery specifications are documented and ready for the first vertical slice.
+The project is in **M1 foundation development**. The documentation set, React application shell, runtime-validated domain contracts, versioned local learner state, and first golden exercise are in place.
 
 ## Product idea
 
@@ -37,6 +37,26 @@ Today's Mission
 - Vitest, React Testing Library, and end-to-end tests
 
 No backend or account is required for the initial MVP.
+
+## Getting started
+
+Requirements:
+
+- Node.js 20.19 or newer
+- npm 10 or newer
+
+```bash
+npm install
+npm run dev
+```
+
+Quality checks:
+
+```bash
+npm run check
+```
+
+This runs ESLint, the Vitest suite, TypeScript project builds, and the Vite production build.
 
 ## Documentation
 
@@ -85,12 +105,12 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 
 ## Development status
 
-- Project status: Planned
+- Project status: M1 in progress
 - M1–M5 milestones: defined
-- Application scaffold: not started
-- Current recommended work: TAO-17 and TAO-18
-
-Installation and development commands will be added after the application scaffold is committed.
+- Application scaffold: complete
+- Exercise and learner-state contracts: initial version implemented
+- Golden exercise: React derived-state review available
+- Current recommended work: complete TAO-18 review, then start TAO-20’s review interaction
 
 ## License
 

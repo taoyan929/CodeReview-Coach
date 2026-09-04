@@ -10,3 +10,7 @@ The project follows the principles of [Keep a Changelog](https://keepachangelog.
 
 - Initial product, UX, learning-model, architecture, data, API, AI, testing, and delivery documentation.
 - Repository governance, roadmap, security policy, glossary, and architecture decision records.
+- React, TypeScript, Vite, Tailwind CSS, routing, linting, testing, and CI foundation.
+- Runtime-validated exercise, curriculum, and learner-state contracts.
+- Versioned local learner-state repository and first React golden exercise.
+- Foundation Dashboard and read-only Challenge route.
