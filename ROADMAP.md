@@ -1,13 +1,13 @@
 # Roadmap
 
-> Status: Planned · Last reviewed: 2026-09-04
+> Status: In progress · Last reviewed: 2026-09-05
 
 ## M1 — Foundation and learning engine
 
 Goal: establish the application, stable contracts, versioned learner state, and a small validated exercise set.
 
-- TAO-17 — Bootstrap React + TypeScript application
-- TAO-18 — Define exercise, curriculum, and learning-state data model
+- TAO-17 — Bootstrap React + TypeScript application ✅
+- TAO-18 — Define exercise, curriculum, and learning-state data model ✅
 - TAO-19 — Create the first full-stack review exercise pack
 
 Exit gate: one schema-valid exercise loads through the repository boundary and learner state can be persisted and migrated.
@@ -16,7 +16,7 @@ Exit gate: one schema-valid exercise loads through the repository boundary and l
 
 Goal: complete the core learn-review-feedback-fix loop.
 
-- TAO-20 — Build structured daily review workspace
+- TAO-20 — Build structured daily review workspace ✅
 - TAO-21 — Implement deterministic review scoring and coaching feedback
 - TAO-22 — Add fix-the-code practice step
 

@@ -1,10 +1,10 @@
 # Repository structure
 
-> Status: Proposed · Last reviewed: 2026-09-04
+> Status: Active · Last reviewed: 2026-09-05
 
-The repository starts documentation-first. Application directories should be introduced by TAO-17 rather than created as empty placeholders.
+The repository started documentation-first and now follows the application boundaries below.
 
-## Planned structure
+## Structure
 
 ```text
 .

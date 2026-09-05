@@ -2,7 +2,7 @@
 
 CodeReview Coach is a local-first learning product that helps junior developers practise reading, reviewing, explaining, and fixing code—especially code produced with AI assistance.
 
-The project is in **M1 foundation development**. The documentation set, React application shell, runtime-validated domain contracts, versioned local learner state, and first golden exercise are in place.
+The project is in **M2 review-experience development**. The documentation set, React application shell, runtime-validated domain contracts, versioned local learner state, first golden exercise, and structured review workspace are in place.
 
 ## Product idea
 
@@ -82,22 +82,21 @@ Supporting documents:
 - [Contributing guide](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
 
-## First implementation slice
+## Current implementation slice
 
-The first slice should take exactly one beginner React or FastAPI challenge through the complete flow:
+The golden React exercise currently supports the first half of the complete flow:
 
 ```text
-dashboard placeholder
+dashboard
 → challenge brief
 → select a suspicious line
 → structured finding
-→ deterministic feedback
-→ final reveal
-→ fix code
-→ persist completion
+→ progressive hints
+→ submit and persist an attempt
+→ first-feedback state
 ```
 
-This validates the contracts and learning loop before building a broad exercise library or a polished progress dashboard.
+TAO-21 will add deterministic evaluation and staged feedback; TAO-22 will add the fix step and final reveal.
 
 ## Project management
 
@@ -105,12 +104,13 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 
 ## Development status
 
-- Project status: M1 in progress
+- Project status: M2 in progress
 - M1–M5 milestones: defined
 - Application scaffold: complete
 - Exercise and learner-state contracts: initial version implemented
 - Golden exercise: React derived-state review available
-- Current recommended work: complete TAO-18 review, then start TAO-20’s review interaction
+- Structured review workspace: line/range selection, guided findings, progressive hints, multiple comments, submission, retry, and local attempt persistence implemented
+- Current recommended work: implement TAO-21 deterministic review scoring and staged coaching feedback
 
 ## License
 
