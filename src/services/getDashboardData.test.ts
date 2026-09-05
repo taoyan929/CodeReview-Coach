@@ -1,5 +1,6 @@
-import { foundationPreviewCurriculum } from '../data/curriculum'
+import { mvpCurriculum } from '../data/curriculum'
 import { reactDerivedStateExercise } from '../data/exercises/reactDerivedState'
+import { starterExercisePack } from '../data/exercises/starterExercisePack'
 import type {
   LearnerState,
   LearnerStateRepository,
@@ -27,8 +28,8 @@ class MemoryLearnerStateRepository implements LearnerStateRepository {
 describe('getDashboardData', () => {
   it('builds a mission and persists synchronised progress state', async () => {
     const exerciseRepository = new LocalExerciseRepository(
-      [reactDerivedStateExercise],
-      foundationPreviewCurriculum,
+      [reactDerivedStateExercise, ...starterExercisePack],
+      mvpCurriculum,
     )
     const learnerStateRepository = new MemoryLearnerStateRepository(
       createInitialLearnerState(new Date('2026-09-05T00:00:00.000Z')),
@@ -42,7 +43,11 @@ describe('getDashboardData', () => {
 
     expect(result.learnerState.dailyMission).toMatchObject({
       date: '2026-09-05',
-      exerciseIds: [reactDerivedStateExercise.id],
+      exerciseIds: [
+        reactDerivedStateExercise.id,
+        'javascript-strict-equality-01',
+        'javascript-map-return-01',
+      ],
       completedExerciseIds: [],
     })
     expect(result.progress.byTrack).toHaveLength(10)

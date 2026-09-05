@@ -67,8 +67,15 @@ export function DashboardPage() {
     )
     .map((id) => exercises.find((exercise) => exercise.id === id))
     .find((exercise): exercise is Exercise => Boolean(exercise))
-  const fallbackExercise = exercises[0]
+  const fallbackExercise =
+    exercises.find(
+      ({ id }) => !learnerState.completedExerciseIds.includes(id),
+    ) ?? exercises[0]
   const nextExercise = missionExercise ?? fallbackExercise
+  const hasIncompleteFallback = Boolean(
+    fallbackExercise &&
+    !learnerState.completedExerciseIds.includes(fallbackExercise.id),
+  )
   const missionCompleted =
     learnerState.dailyMission?.completedExerciseIds.length ?? 0
   const missionTotal = learnerState.dailyMission?.exerciseIds.length ?? 0
@@ -128,7 +135,11 @@ export function DashboardPage() {
               className="mt-10 inline-flex items-center gap-3 rounded-full bg-mint px-6 py-3.5 font-semibold text-ink transition hover:bg-[#92f0c3] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint"
               to={`/challenge/${nextExercise.id}`}
             >
-              {missionExercise ? 'Continue today’s mission' : 'Review again'}
+              {missionExercise
+                ? 'Continue today’s mission'
+                : hasIncompleteFallback
+                  ? 'Start next challenge'
+                  : 'Review again'}
               <span aria-hidden="true">→</span>
             </Link>
           ) : (

@@ -1,4 +1,4 @@
-> Status: Draft · Last reviewed: 2026-09-04 · Imported from [Linear](https://linear.app/taoyan929/document/09-testing-content-qa-and-non-functional-requirements-bfe6f92c654d).
+> Status: Content QA implemented · Last reviewed: 2026-09-05 · Imported from [Linear](https://linear.app/taoyan929/document/09-testing-content-qa-and-non-functional-requirements-bfe6f92c654d).
 >
 > Repository Markdown is the implementation reference. Material product changes should be reflected in both this document and the matching Linear issue or project document.
 
@@ -76,6 +76,8 @@ Every curated exercise should pass a content checklist:
 * reference fix actually solves the issue
 * difficulty and estimated time are reasonable
 * concepts/tags/prerequisites are correct
+
+The TAO-19 content gate enforces these structural rules at repository startup and in CI. The built-in pack contains 24 schema-valid exercises, 1–2 expected findings per exercise, complete three-level hints, matching reference files, and four executable golden evaluation cases per exercise.
 
 ## 4. Golden evaluation cases
 
@@ -182,4 +184,3 @@ An exercise is not “done” merely because it renders. It must:
 * README and Linear docs match actual architecture
 * known limitations documented
 * AI/GitHub future interfaces remain optional and do not complicate MVP runtime
-

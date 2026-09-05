@@ -22,3 +22,5 @@ The project follows the principles of [Keep a Changelog](https://keepachangelog.
 - Editable fix-the-code practice, structured fix persistence, learner-gated three-way comparison, and review-to-completion transition.
 - Deterministic curriculum completion and mastery snapshots across all tracks and learning levels.
 - Weak-concept and weak-track detection, recent activity, learning streaks, daily/weekly goal progress, unlock states, and two-step local progress reset.
+- A 24-exercise, 100-point starter curriculum spanning all 10 MVP tracks, three learning levels, eight mission formats, and two multi-file full-stack reviews.
+- Startup content quality gates and 96 embedded golden scoring cases for strong, poor-English-but-correct, partial, and incorrect review responses.

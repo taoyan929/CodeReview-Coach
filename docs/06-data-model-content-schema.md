@@ -70,11 +70,14 @@ interface Exercise {
   hints: Hint[];
   referenceReview?: string;
   referenceSolution?: CodeFile[];
+  evaluationCases?: GoldenEvaluationCase[];
   prerequisites?: string[];
   curriculumWeight: number;
   tags?: string[];
 }
 ```
+
+`evaluationCases` stores reviewable deterministic benchmark submissions for an important expected finding. The built-in pack requires four cases per exercise: strong, technically correct with poor English, partial, and incorrect. Each case records the structured finding input and expected finding status so scoring regressions fail in CI.
 
 ## 4. Requirement/context
 
@@ -301,4 +304,4 @@ AI output is additive to deterministic evaluation rather than replacing the base
 
 ## 17. Validation
 
-All exercise/curriculum content should be schema-validated at build/startup time. Invalid content must fail clearly during development rather than silently producing broken learning experiences.
+All exercise/curriculum content is schema-validated at build/startup time. The content gate additionally checks unique IDs, 1–4 expected findings, valid source line references, progressive hint levels 1–3, reference review/solution coverage, supported duration, and all four golden evaluation cases. Invalid content fails clearly during development rather than silently producing broken learning experiences.

@@ -1,39 +1,35 @@
-import { foundationPreviewCurriculum } from '../data/curriculum'
+import { mvpCurriculum } from '../data/curriculum'
 import { reactDerivedStateExercise } from '../data/exercises/reactDerivedState'
+import { starterExercisePack } from '../data/exercises/starterExercisePack'
 import { LocalExerciseRepository } from './LocalExerciseRepository'
+
+const exercises = [reactDerivedStateExercise, ...starterExercisePack]
 
 describe('LocalExerciseRepository', () => {
   it('filters exercises by track', async () => {
-    const repository = new LocalExerciseRepository(
-      [reactDerivedStateExercise],
-      foundationPreviewCurriculum,
-    )
+    const repository = new LocalExerciseRepository(exercises, mvpCurriculum)
 
     await expect(
       repository.listExercises({ track: 'react' }),
-    ).resolves.toHaveLength(1)
+    ).resolves.toHaveLength(4)
     await expect(
       repository.listExercises({ track: 'python' }),
-    ).resolves.toEqual([])
+    ).resolves.toHaveLength(2)
   })
 
   it('fails when curriculum content is missing', () => {
     const invalidCurriculum = {
-      ...foundationPreviewCurriculum,
+      ...mvpCurriculum,
       levels: [
         {
-          ...foundationPreviewCurriculum.levels[0]!,
+          ...mvpCurriculum.levels[0]!,
           exerciseIds: ['missing-exercise'],
         },
       ],
     }
 
     expect(
-      () =>
-        new LocalExerciseRepository(
-          [reactDerivedStateExercise],
-          invalidCurriculum,
-        ),
+      () => new LocalExerciseRepository(exercises, invalidCurriculum),
     ).toThrow(/unknown exercise/)
   })
 })

@@ -2,7 +2,7 @@
 
 CodeReview Coach is a local-first learning product that helps junior developers practise reading, reviewing, explaining, and fixing code—especially code produced with AI assistance.
 
-The project has completed the **M2 review-experience milestone** and the first M3 progress slice. The documentation set, React application shell, runtime-validated domain contracts, versioned local learner state, complete review-feedback-fix golden exercise, and deterministic progress dashboard are in place.
+The project has completed **M1 Foundation**, **M2 Review Experience**, and the first M3 progress slice. The application now includes a runtime-validated 24-exercise full-stack curriculum, versioned local learner state, complete review-feedback-fix workflow, and deterministic progress dashboard.
 
 ## Product idea
 
@@ -102,7 +102,7 @@ dashboard
 → inspect recent activity and track/level progress
 ```
 
-This completes the M2 golden vertical slice and TAO-23 progress foundation without requiring AI evaluation.
+The same flow now runs across 24 curated exercises covering JavaScript, TypeScript, React, Python, FastAPI, REST APIs, SQL, MongoDB/Cosmos DB, testing, and security. Two multi-file Level 3 exercises validate cross-stack review and the Boss Review model.
 
 ## Project management
 
@@ -110,16 +110,17 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 
 ## Development status
 
-- Project status: M2 complete; TAO-23 progress tracking complete; M3 adaptation next
+- Project status: M1 and M2 complete; TAO-23 progress tracking complete; M3 adaptation next
 - M1–M5 milestones: defined
 - Application scaffold: complete
 - Exercise and learner-state contracts: initial version implemented
-- Golden exercise: React derived-state review available
+- Curriculum: 24 curated exercises, 100-point built-in path, all 10 MVP tracks, all 3 learning levels, and all 8 mission formats
+- Content quality: startup schema/QA validation plus 96 embedded golden scoring cases covering strong, poor-English-but-correct, partial, and incorrect responses
 - Structured review workspace: independent line selection, guided findings, progressive hints, multiple comments, submission, retry, and local attempt persistence implemented
 - Deterministic scoring: finding-level technical dimensions, separate communication score, assistance tracking, staged feedback, and final reveal implemented
 - Fix practice: editable working copy, learner-gated reference comparison, structured fix submission, and completion transition implemented
 - Progress tracking: separate curriculum completion and mastery, all-track/all-level breakdowns, weak areas, activity history, streaks, daily/weekly goals, unlock states, and reset implemented
-- Current recommended work: complete TAO-19’s representative exercise pack before building TAO-25 recommendations
+- Current recommended work: build TAO-25 rule-based recommendations from the completed curriculum and progress signals
 
 ## License
 

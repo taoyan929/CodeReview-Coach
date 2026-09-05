@@ -3,6 +3,11 @@ const labels: Record<string, string> = {
   typescript: 'TypeScript',
   fastapi: 'FastAPI',
   'rest-api': 'REST API',
+  'api-design': 'API Design',
+  'review-the-ai': 'Review the AI',
+  'ship-or-block': 'Ship or Block?',
+  'standard-review': 'Standard Review',
+  'boss-review': 'Boss Review',
   sql: 'SQL',
   nosql: 'MongoDB / Cosmos DB',
 }

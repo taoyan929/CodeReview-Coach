@@ -4,6 +4,7 @@ import type {
   ExerciseFilters,
 } from '../domain/exercise/types'
 import type { ExerciseRepository } from '../domain/learning/types'
+import { validateExercisePack } from '../data/validateExerciseContent'
 import { parseCurriculum, parseExercise } from '../schemas/exerciseSchema'
 
 export class LocalExerciseRepository implements ExerciseRepository {
@@ -13,6 +14,7 @@ export class LocalExerciseRepository implements ExerciseRepository {
   constructor(exercises: unknown[], curriculum: unknown) {
     this.exercises = exercises.map(parseExercise)
     this.curriculum = parseCurriculum(curriculum)
+    validateExercisePack(this.exercises)
     this.validateCurriculumReferences()
   }
 

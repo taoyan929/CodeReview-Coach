@@ -95,6 +95,30 @@ export interface ExpectedFinding {
   referenceComment: string
 }
 
+export const goldenCaseKinds = [
+  'strong',
+  'poor-english-correct',
+  'partial',
+  'incorrect',
+] as const
+
+export type GoldenCaseKind = (typeof goldenCaseKinds)[number]
+
+export interface GoldenEvaluationCase {
+  id: string
+  kind: GoldenCaseKind
+  expectedFindingId: string
+  submission: {
+    fileId: string
+    locations: CodeLocation[]
+    category?: IssueCategory
+    diagnosis: string
+    impact?: string
+    suggestedFix?: string
+  }
+  expectedFindingStatus: 'strong' | 'partial' | 'missed' | 'incorrect'
+}
+
 export interface Exercise {
   id: string
   version: number
@@ -113,6 +137,7 @@ export interface Exercise {
   hints: Hint[]
   referenceReview?: string
   referenceSolution?: CodeFile[]
+  evaluationCases?: GoldenEvaluationCase[]
   prerequisites?: string[]
   curriculumWeight: number
   tags?: string[]

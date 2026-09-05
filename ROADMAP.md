@@ -8,7 +8,7 @@ Goal: establish the application, stable contracts, versioned learner state, and 
 
 - TAO-17 — Bootstrap React + TypeScript application ✅
 - TAO-18 — Define exercise, curriculum, and learning-state data model ✅
-- TAO-19 — Create the first full-stack review exercise pack
+- TAO-19 — Create the first full-stack review exercise pack ✅
 
 Exit gate: one schema-valid exercise loads through the repository boundary and learner state can be persisted and migrated.
 
@@ -53,4 +53,4 @@ Entry gate: curated content is a reliable baseline, AI Coach quality is measured
 
 ## Delivery rule
 
-Build vertical slices. Stabilise the data contract, then validate one golden exercise through the full learning loop before scaling content or polishing secondary screens. The next recommended slice is TAO-19 so the progress and recommendation engines have a representative exercise pack.
+Build vertical slices. Stabilise the data contract, then validate one golden exercise through the full learning loop before scaling content or polishing secondary screens. With the representative exercise pack complete, the next recommended slice is TAO-25 rule-based recommendations.

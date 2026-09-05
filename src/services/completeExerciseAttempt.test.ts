@@ -1,4 +1,4 @@
-import { foundationPreviewCurriculum } from '../data/curriculum'
+import { mvpCurriculum } from '../data/curriculum'
 import { reactDerivedStateExercise } from '../data/exercises/reactDerivedState'
 import type {
   ExerciseAttempt,
@@ -61,7 +61,7 @@ describe('completeExerciseAttempt', () => {
           exercise: reactDerivedStateExercise,
           files: reactDerivedStateExercise.files,
           exercises: [reactDerivedStateExercise],
-          curriculum: foundationPreviewCurriculum,
+          curriculum: mvpCurriculum,
         },
         repository,
       ),
@@ -94,7 +94,7 @@ describe('completeExerciseAttempt', () => {
         exercise: reactDerivedStateExercise,
         files: fixedFiles,
         exercises: [reactDerivedStateExercise],
-        curriculum: foundationPreviewCurriculum,
+        curriculum: mvpCurriculum,
       },
       repository,
       new Date('2026-09-05T00:02:00.000Z'),
@@ -105,7 +105,7 @@ describe('completeExerciseAttempt', () => {
     expect(repository.state.completedExerciseIds).toEqual([
       reactDerivedStateExercise.id,
     ])
-    expect(repository.state.curriculumCompletion).toBe(100)
+    expect(repository.state.curriculumCompletion).toBe(8)
     expect(repository.state.dailyMission?.completedExerciseIds).toEqual([
       reactDerivedStateExercise.id,
     ])

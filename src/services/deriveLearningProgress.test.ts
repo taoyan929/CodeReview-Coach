@@ -1,4 +1,4 @@
-import { foundationPreviewCurriculum } from '../data/curriculum'
+import { mvpCurriculum } from '../data/curriculum'
 import { reactDerivedStateExercise } from '../data/exercises/reactDerivedState'
 import type { ExerciseAttempt, LearnerState } from '../domain/learning/types'
 import { createInitialLearnerState } from '../domain/learning/types'
@@ -36,7 +36,7 @@ function progressFor(
   return deriveLearningProgress(
     learnerState,
     [reactDerivedStateExercise],
-    foundationPreviewCurriculum,
+    mvpCurriculum,
     now,
   )
 }
@@ -79,7 +79,7 @@ describe('deriveLearningProgress', () => {
     const progress = progressFor(state)
 
     expect(calculateAttemptMastery(completedAttempt)).toBe(85)
-    expect(progress.curriculumCompletion).toBe(100)
+    expect(progress.curriculumCompletion).toBe(8)
     expect(progress.reviewMastery).toBe(85)
     expect(progress.byTrack.find(({ id }) => id === 'react')).toMatchObject({
       completion: 100,
@@ -158,7 +158,7 @@ describe('deriveLearningProgress', () => {
     const synchronised = synchroniseLearnerProgress(
       state,
       [reactDerivedStateExercise],
-      foundationPreviewCurriculum,
+      mvpCurriculum,
       new Date('2026-09-05T12:00:00.000Z'),
     )
 

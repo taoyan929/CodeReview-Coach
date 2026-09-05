@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import {
+  goldenCaseKinds,
   issueCategories,
   learningLevels,
   missionTypes,
@@ -51,6 +52,21 @@ const expectedFindingSchema = z.object({
   referenceComment: z.string().min(1),
 })
 
+const goldenEvaluationCaseSchema = z.object({
+  id: z.string().min(1),
+  kind: z.enum(goldenCaseKinds),
+  expectedFindingId: z.string().min(1),
+  submission: z.object({
+    fileId: z.string().min(1),
+    locations: z.array(codeLocationSchema).min(1),
+    category: z.enum(issueCategories).optional(),
+    diagnosis: z.string().min(1),
+    impact: z.string().optional(),
+    suggestedFix: z.string().optional(),
+  }),
+  expectedFindingStatus: z.enum(['strong', 'partial', 'missed', 'incorrect']),
+})
+
 export const exerciseSchema = z
   .object({
     id: z.string().min(1),
@@ -82,12 +98,16 @@ export const exerciseSchema = z
     hints: z.array(hintSchema),
     referenceReview: z.string().min(1).optional(),
     referenceSolution: z.array(codeFileSchema).optional(),
+    evaluationCases: z.array(goldenEvaluationCaseSchema).optional(),
     prerequisites: z.array(z.string().min(1)).optional(),
     curriculumWeight: z.number().positive(),
     tags: z.array(z.string().min(1)).optional(),
   })
   .superRefine((exercise, context) => {
     const fileIds = new Set(exercise.files.map((file) => file.id))
+    const expectedFindingIds = new Set(
+      exercise.expectedFindings.map((finding) => finding.id),
+    )
 
     for (const finding of exercise.expectedFindings) {
       if (!fileIds.has(finding.fileId)) {
@@ -95,6 +115,24 @@ export const exerciseSchema = z
           code: 'custom',
           message: `Expected finding ${finding.id} references unknown file ${finding.fileId}`,
           path: ['expectedFindings'],
+        })
+      }
+    }
+
+    for (const evaluationCase of exercise.evaluationCases ?? []) {
+      if (!fileIds.has(evaluationCase.submission.fileId)) {
+        context.addIssue({
+          code: 'custom',
+          message: `Evaluation case ${evaluationCase.id} references unknown file ${evaluationCase.submission.fileId}`,
+          path: ['evaluationCases'],
+        })
+      }
+
+      if (!expectedFindingIds.has(evaluationCase.expectedFindingId)) {
+        context.addIssue({
+          code: 'custom',
+          message: `Evaluation case ${evaluationCase.id} references unknown finding ${evaluationCase.expectedFindingId}`,
+          path: ['evaluationCases'],
         })
       }
     }

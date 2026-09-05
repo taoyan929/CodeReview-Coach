@@ -27,4 +27,13 @@ describe('exerciseSchema', () => {
       /endLine must be greater/,
     )
   })
+
+  it('rejects evaluation cases that reference a missing finding', () => {
+    const invalidExercise = structuredClone(reactDerivedStateExercise)
+    invalidExercise.evaluationCases![0]!.expectedFindingId = 'missing-finding'
+
+    expect(() => parseExercise(invalidExercise)).toThrow(
+      /references unknown finding/,
+    )
+  })
 })

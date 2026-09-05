@@ -149,6 +149,59 @@ export const reactDerivedStateExercise: Exercise = {
       changeType: 'modified',
     },
   ],
-  curriculumWeight: 100,
+  evaluationCases: [
+    {
+      id: 'react-derived-state-strong',
+      kind: 'strong',
+      expectedFindingId: 'derived-state-does-not-update',
+      submission: {
+        fileId: 'task-list',
+        locations: [{ startLine: 15 }, { startLine: 17 }],
+        category: 'logic',
+        diagnosis: 'visibleTasks becomes stale when props change',
+        impact: 'props can change after the initial render',
+        suggestedFix:
+          'remove useState and calculate visibleTasks during render',
+      },
+      expectedFindingStatus: 'strong',
+    },
+    {
+      id: 'react-derived-state-poor-english',
+      kind: 'poor-english-correct',
+      expectedFindingId: 'derived-state-does-not-update',
+      submission: {
+        fileId: 'task-list',
+        locations: [{ startLine: 15 }],
+        category: 'logic',
+        diagnosis: 'visibleTasks becomes stale when props change',
+      },
+      expectedFindingStatus: 'strong',
+    },
+    {
+      id: 'react-derived-state-partial',
+      kind: 'partial',
+      expectedFindingId: 'derived-state-does-not-update',
+      submission: {
+        fileId: 'task-list',
+        locations: [{ startLine: 16 }],
+        category: 'other',
+        diagnosis: 'Something in this area may be wrong.',
+      },
+      expectedFindingStatus: 'partial',
+    },
+    {
+      id: 'react-derived-state-incorrect',
+      kind: 'incorrect',
+      expectedFindingId: 'derived-state-does-not-update',
+      submission: {
+        fileId: 'task-list',
+        locations: [{ startLine: 2 }],
+        category: 'other',
+        diagnosis: 'Rename Task to Item.',
+      },
+      expectedFindingStatus: 'missed',
+    },
+  ],
+  curriculumWeight: 8,
   tags: ['golden-exercise', 'm1', 'react'],
 }

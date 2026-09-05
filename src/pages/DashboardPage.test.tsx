@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { vi } from 'vitest'
 
-import { foundationPreviewCurriculum } from '../data/curriculum'
+import { mvpCurriculum } from '../data/curriculum'
 import { reactDerivedStateExercise } from '../data/exercises/reactDerivedState'
 import { createInitialLearnerState } from '../domain/learning/types'
 import { deriveLearningProgress } from '../services/deriveLearningProgress'
@@ -29,7 +29,7 @@ function renderDashboard() {
   const progress = deriveLearningProgress(
     learnerState,
     [reactDerivedStateExercise],
-    foundationPreviewCurriculum,
+    mvpCurriculum,
     new Date('2026-09-05T12:00:00.000Z'),
   )
   const router = createMemoryRouter([
