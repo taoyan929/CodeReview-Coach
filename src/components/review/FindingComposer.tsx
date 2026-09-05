@@ -26,6 +26,14 @@ export function FindingComposer({
   const [diagnosis, setDiagnosis] = useState('')
   const [impact, setImpact] = useState('')
   const [suggestedFix, setSuggestedFix] = useState('')
+  const [showDisabledReason, setShowDisabledReason] = useState(false)
+  const isAddUnavailable = selectedLines.length === 0 || !diagnosis.trim()
+  const disabledReason =
+    selectedLines.length === 0 && !diagnosis.trim()
+      ? 'Select at least one code line and describe what you noticed.'
+      : selectedLines.length === 0
+        ? 'Select at least one code line first.'
+        : 'Describe what you noticed before adding the finding.'
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -43,6 +51,7 @@ export function FindingComposer({
     setDiagnosis('')
     setImpact('')
     setSuggestedFix('')
+    setShowDisabledReason(false)
   }
 
   const lineLabel =
@@ -117,12 +126,43 @@ export function FindingComposer({
       />
 
       <button
-        className="mt-6 w-full rounded-full bg-paper px-5 py-3 text-sm font-semibold text-ink transition enabled:hover:bg-white disabled:cursor-not-allowed disabled:opacity-35"
-        disabled={selectedLines.length === 0 || !diagnosis.trim()}
+        aria-describedby={
+          isAddUnavailable ? 'add-finding-disabled-reason' : undefined
+        }
+        className={`mt-6 w-full rounded-full bg-paper px-5 py-3 text-sm font-semibold text-ink transition ${
+          isAddUnavailable ? 'cursor-help opacity-35' : 'hover:bg-white'
+        }`}
+        onBlur={() => setShowDisabledReason(false)}
+        onClick={() => {
+          if (isAddUnavailable) setShowDisabledReason(true)
+        }}
+        onFocus={() => {
+          if (isAddUnavailable) setShowDisabledReason(true)
+        }}
+        onMouseEnter={() => {
+          if (isAddUnavailable) setShowDisabledReason(true)
+        }}
+        onMouseLeave={() => setShowDisabledReason(false)}
         type="submit"
       >
         Add finding
       </button>
+      {isAddUnavailable && (
+        <p
+          aria-live="polite"
+          className={
+            showDisabledReason
+              ? 'mt-3 rounded-xl border border-amber-200/20 bg-amber-200/[0.06] px-3 py-2 text-center text-xs leading-5 text-amber-100/80'
+              : 'sr-only'
+          }
+          id="add-finding-disabled-reason"
+          role="status"
+        >
+          {showDisabledReason
+            ? disabledReason
+            : `Add finding is unavailable. ${disabledReason}`}
+        </p>
+      )}
     </form>
   )
 }
