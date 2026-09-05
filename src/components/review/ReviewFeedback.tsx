@@ -15,6 +15,7 @@ interface ReviewFeedbackProps {
   canRequestHint: boolean
   onRetry: () => void
   onRetryWithHint: () => void
+  onStartFix: () => void
 }
 
 const dimensionLabels = {
@@ -41,6 +42,7 @@ export function ReviewFeedback({
   canRequestHint,
   onRetry,
   onRetryWithHint,
+  onStartFix,
 }: ReviewFeedbackProps) {
   const [showFinalFeedback, setShowFinalFeedback] = useState(false)
   const evaluation = attempt.evaluation
@@ -301,10 +303,17 @@ export function ReviewFeedback({
       <div className="mt-10 flex flex-wrap gap-3">
         <button
           className="rounded-full bg-mint px-6 py-3 font-semibold text-ink transition hover:bg-[#92f0c3]"
+          onClick={onStartFix}
+          type="button"
+        >
+          Fix the code
+        </button>
+        <button
+          className="rounded-full border border-white/15 px-6 py-3 font-semibold text-paper transition hover:border-white/30 hover:bg-white/[0.04]"
           onClick={onRetry}
           type="button"
         >
-          Retry exercise
+          Retry review
         </button>
         <Link
           className="rounded-full border border-white/15 px-6 py-3 font-semibold text-paper transition hover:border-white/30 hover:bg-white/[0.04]"

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 
 import { CodeReviewPanel } from '../components/review/CodeReviewPanel'
+import { FixCodeStep } from '../components/review/FixCodeStep'
 import {
   FindingComposer,
   type FindingDraft,
@@ -16,6 +17,7 @@ import type {
 } from '../domain/learning/types'
 import { learnerStateRepository } from '../repositories'
 import { submitReviewAttempt } from '../services/submitReviewAttempt'
+import { completeExerciseAttempt } from '../services/completeExerciseAttempt'
 import { formatLabel } from '../utils/formatLabel'
 
 interface ChallengeLoaderData {
@@ -30,6 +32,7 @@ export function ChallengePage() {
   const [hintsUsed, setHintsUsed] = useState<HintUsage[]>([])
   const [startedAt, setStartedAt] = useState(() => new Date().toISOString())
   const [submittedAttempt, setSubmittedAttempt] = useState<ExerciseAttempt>()
+  const [isFixing, setIsFixing] = useState(false)
   const [submitError, setSubmitError] = useState<string>()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -110,6 +113,7 @@ export function ChallengePage() {
     setHintsUsed(nextHints)
     setStartedAt(new Date().toISOString())
     setSubmittedAttempt(undefined)
+    setIsFixing(false)
     setSubmitError(undefined)
   }
 
@@ -128,6 +132,23 @@ export function ChallengePage() {
     ])
   }
 
+  if (submittedAttempt && isFixing) {
+    return (
+      <FixCodeStep
+        attempt={submittedAttempt}
+        exercise={exercise}
+        onSubmit={async (files) => {
+          const completedAttempt = await completeExerciseAttempt(
+            { attemptId: submittedAttempt.id, exercise, files },
+            learnerStateRepository,
+          )
+          setSubmittedAttempt(completedAttempt)
+          return completedAttempt
+        }}
+      />
+    )
+  }
+
   if (submittedAttempt) {
     return (
       <ReviewFeedback
@@ -136,6 +157,7 @@ export function ChallengePage() {
         exercise={exercise}
         onRetry={retryExercise}
         onRetryWithHint={retryWithHint}
+        onStartFix={() => setIsFixing(true)}
       />
     )
   }

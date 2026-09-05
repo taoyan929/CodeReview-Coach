@@ -103,7 +103,14 @@ Show:
 
 ### Stage D — Fix
 
-Learner edits/corrects code and compares with reference implementation.
+1. Preserve the original exercise snippet.
+2. Give the learner an editable working copy.
+3. Keep the reference solution hidden until the learner changes and submits code.
+4. Persist the structured file submission on the scored attempt.
+5. Mark completion separately from the earlier review submission.
+6. Show original, learner fix and reference implementation side by side.
+
+The MVP records an active fix submission but does not yet claim that arbitrary code is functionally correct. The structured file payload is the boundary where future automated tests and semantic fix evaluation attach.
 
 ## 7. Completion workflow
 

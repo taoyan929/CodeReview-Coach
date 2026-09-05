@@ -2,7 +2,7 @@
 
 CodeReview Coach is a local-first learning product that helps junior developers practise reading, reviewing, explaining, and fixing code—especially code produced with AI assistance.
 
-The project is in **M2 review-experience development**. The documentation set, React application shell, runtime-validated domain contracts, versioned local learner state, first golden exercise, and structured review workspace are in place.
+The project has completed the **M2 review-experience milestone**. The documentation set, React application shell, runtime-validated domain contracts, versioned local learner state, and first complete review-feedback-fix golden exercise are in place.
 
 ## Product idea
 
@@ -84,7 +84,7 @@ Supporting documents:
 
 ## Current implementation slice
 
-The golden React exercise currently supports the first half of the complete flow:
+The golden React exercise now supports the complete review-feedback-fix flow:
 
 ```text
 dashboard
@@ -94,9 +94,13 @@ dashboard
 → progressive hints
 → submit and persist an attempt
 → first-feedback state
+→ learner-controlled final reveal
+→ edit and submit a code fix
+→ compare original, learner fix, and reference implementation
+→ persist completion
 ```
 
-Deterministic evaluation and staged feedback are now implemented. TAO-22 will add the active fix step and complete the golden exercise loop.
+This completes the M2 golden vertical slice without requiring AI evaluation.
 
 ## Project management
 
@@ -104,14 +108,15 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 
 ## Development status
 
-- Project status: M2 in progress
+- Project status: M2 complete; M3 progress and adaptation next
 - M1–M5 milestones: defined
 - Application scaffold: complete
 - Exercise and learner-state contracts: initial version implemented
 - Golden exercise: React derived-state review available
 - Structured review workspace: independent line selection, guided findings, progressive hints, multiple comments, submission, retry, and local attempt persistence implemented
 - Deterministic scoring: finding-level technical dimensions, separate communication score, assistance tracking, staged feedback, and final reveal implemented
-- Current recommended work: implement TAO-22 fix-the-code practice and completion transition
+- Fix practice: editable working copy, learner-gated reference comparison, structured fix submission, and completion transition implemented
+- Current recommended work: implement TAO-23 completion, mastery, and weak-topic tracking
 
 ## License
 

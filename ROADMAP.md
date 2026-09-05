@@ -18,7 +18,7 @@ Goal: complete the core learn-review-feedback-fix loop.
 
 - TAO-20 — Build structured daily review workspace ✅
 - TAO-21 — Implement deterministic review scoring and coaching feedback ✅
-- TAO-22 — Add fix-the-code practice step
+- TAO-22 — Add fix-the-code practice step ✅
 
 Exit gate: a learner can complete one golden exercise end to end without AI.
 
