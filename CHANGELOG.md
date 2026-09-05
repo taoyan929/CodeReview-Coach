@@ -20,3 +20,5 @@ The project follows the principles of [Keep a Changelog](https://keepachangelog.
 - Separate communication scoring, hint-assistance tracking, staged first feedback, and learner-controlled final reveal.
 - Independent non-adjacent code-line selection, per-line double-click removal, and learner-state v2→v3 finding-location migration.
 - Editable fix-the-code practice, structured fix persistence, learner-gated three-way comparison, and review-to-completion transition.
+- Deterministic curriculum completion and mastery snapshots across all tracks and learning levels.
+- Weak-concept and weak-track detection, recent activity, learning streaks, daily/weekly goal progress, unlock states, and two-step local progress reset.

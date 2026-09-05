@@ -1,14 +1,17 @@
-import type { CodeFile, Exercise } from '../domain/exercise/types'
+import type { CodeFile, Curriculum, Exercise } from '../domain/exercise/types'
 import type {
   ExerciseAttempt,
   LearnerState,
   LearnerStateRepository,
 } from '../domain/learning/types'
+import { synchroniseLearnerProgress } from './deriveLearningProgress'
 
 export interface CompleteExerciseAttemptInput {
   attemptId: ExerciseAttempt['id']
   exercise: Exercise
   files: CodeFile[]
+  exercises?: Exercise[]
+  curriculum?: Curriculum
 }
 
 function hasMeaningfulChange(exercise: Exercise, files: CodeFile[]) {
@@ -74,7 +77,7 @@ export async function completeExerciseAttempt(
   const attempts = [...learnerState.attempts]
   attempts[attemptIndex] = updatedAttempt
 
-  await learnerStateRepository.save({
+  const completedState: LearnerState = {
     ...learnerState,
     attempts,
     completedExerciseIds: wasAlreadyCompleted
@@ -88,7 +91,18 @@ export async function completeExerciseAttempt(
         ),
     dailyMission: completeDailyMission(learnerState, input.exercise.id),
     updatedAt: completedAt,
-  })
+  }
+  const stateToSave =
+    input.exercises && input.curriculum
+      ? synchroniseLearnerProgress(
+          completedState,
+          input.exercises,
+          input.curriculum,
+          now,
+        )
+      : completedState
+
+  await learnerStateRepository.save(stateToSave)
 
   return updatedAttempt
 }

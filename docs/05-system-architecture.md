@@ -109,6 +109,8 @@ Pure functions where possible. Converts learner findings + expected findings int
 
 Updates completion, mastery and weak-topic state after an attempt.
 
+The implemented `deriveLearningProgress` service is pure over learner state, exercises, curriculum and time. `synchroniseLearnerProgress` writes its completion, mastery, weak-topic, streak, weekly-goal and unlock snapshot through `LearnerStateRepository`; pages consume the derived read model rather than recalculating history during render.
+
 ### Recommendation domain
 
 Consumes learner state + curriculum to produce ranked next-exercise candidates and explainable reasons.

@@ -2,7 +2,7 @@
 
 CodeReview Coach is a local-first learning product that helps junior developers practise reading, reviewing, explaining, and fixing code—especially code produced with AI assistance.
 
-The project has completed the **M2 review-experience milestone**. The documentation set, React application shell, runtime-validated domain contracts, versioned local learner state, and first complete review-feedback-fix golden exercise are in place.
+The project has completed the **M2 review-experience milestone** and the first M3 progress slice. The documentation set, React application shell, runtime-validated domain contracts, versioned local learner state, complete review-feedback-fix golden exercise, and deterministic progress dashboard are in place.
 
 ## Product idea
 
@@ -98,9 +98,11 @@ dashboard
 → edit and submit a code fix
 → compare original, learner fix, and reference implementation
 → persist completion
+→ calculate mastery, weak areas, streaks, goals, and unlocks
+→ inspect recent activity and track/level progress
 ```
 
-This completes the M2 golden vertical slice without requiring AI evaluation.
+This completes the M2 golden vertical slice and TAO-23 progress foundation without requiring AI evaluation.
 
 ## Project management
 
@@ -108,7 +110,7 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 
 ## Development status
 
-- Project status: M2 complete; M3 progress and adaptation next
+- Project status: M2 complete; TAO-23 progress tracking complete; M3 adaptation next
 - M1–M5 milestones: defined
 - Application scaffold: complete
 - Exercise and learner-state contracts: initial version implemented
@@ -116,7 +118,8 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 - Structured review workspace: independent line selection, guided findings, progressive hints, multiple comments, submission, retry, and local attempt persistence implemented
 - Deterministic scoring: finding-level technical dimensions, separate communication score, assistance tracking, staged feedback, and final reveal implemented
 - Fix practice: editable working copy, learner-gated reference comparison, structured fix submission, and completion transition implemented
-- Current recommended work: implement TAO-23 completion, mastery, and weak-topic tracking
+- Progress tracking: separate curriculum completion and mastery, all-track/all-level breakdowns, weak areas, activity history, streaks, daily/weekly goals, unlock states, and reset implemented
+- Current recommended work: complete TAO-19’s representative exercise pack before building TAO-25 recommendations
 
 ## License
 

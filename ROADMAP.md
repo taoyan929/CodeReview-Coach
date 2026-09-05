@@ -26,7 +26,7 @@ Exit gate: a learner can complete one golden exercise end to end without AI.
 
 Goal: make the deterministic product useful for repeated daily practice.
 
-- TAO-23 — Track completion, mastery, and weak topics
+- TAO-23 — Track completion, mastery, and weak topics ✅
 - TAO-25 — Implement rule-based recommendations
 - TAO-26 — Add missions, streaks, unlocks, and Boss Reviews
 - TAO-30 — Build Dashboard, Today’s Mission, and Learning Path UI
@@ -53,4 +53,4 @@ Entry gate: curated content is a reliable baseline, AI Coach quality is measured
 
 ## Delivery rule
 
-Build vertical slices. Stabilise the data contract, then validate one golden exercise through the full learning loop before scaling content or polishing secondary screens.
+Build vertical slices. Stabilise the data contract, then validate one golden exercise through the full learning loop before scaling content or polishing secondary screens. The next recommended slice is TAO-19 so the progress and recommendation engines have a representative exercise pack.

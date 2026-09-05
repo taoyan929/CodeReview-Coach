@@ -1,3 +1,4 @@
+import { foundationPreviewCurriculum } from '../data/curriculum'
 import { reactDerivedStateExercise } from '../data/exercises/reactDerivedState'
 import type {
   ExerciseAttempt,
@@ -59,6 +60,8 @@ describe('completeExerciseAttempt', () => {
           attemptId: 'attempt-1',
           exercise: reactDerivedStateExercise,
           files: reactDerivedStateExercise.files,
+          exercises: [reactDerivedStateExercise],
+          curriculum: foundationPreviewCurriculum,
         },
         repository,
       ),
@@ -90,6 +93,8 @@ describe('completeExerciseAttempt', () => {
         attemptId: 'attempt-1',
         exercise: reactDerivedStateExercise,
         files: fixedFiles,
+        exercises: [reactDerivedStateExercise],
+        curriculum: foundationPreviewCurriculum,
       },
       repository,
       new Date('2026-09-05T00:02:00.000Z'),
@@ -104,5 +109,16 @@ describe('completeExerciseAttempt', () => {
     expect(repository.state.dailyMission?.completedExerciseIds).toEqual([
       reactDerivedStateExercise.id,
     ])
+    expect(repository.state.mastery.overall).toBeDefined()
+    expect(repository.state.mastery.byTrack.react).toBeDefined()
+    expect(repository.state.streak).toMatchObject({
+      currentDays: 1,
+      longestDays: 1,
+      lastActiveDate: '2026-09-05',
+    })
+    expect(repository.state.weeklyGoal).toMatchObject({
+      targetExercises: 5,
+      completedExercises: 1,
+    })
   })
 })

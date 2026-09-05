@@ -5,10 +5,16 @@ import type {
   LearnerStateRepository,
 } from '../domain/learning/types'
 import { buildDailyMission } from './buildDailyMission'
+import {
+  deriveLearningProgress,
+  synchroniseLearnerProgress,
+  type LearningProgressSnapshot,
+} from './deriveLearningProgress'
 
 export interface DashboardData {
   exercises: Exercise[]
   learnerState: LearnerState
+  progress: LearningProgressSnapshot
 }
 
 export async function getDashboardData(
@@ -16,27 +22,35 @@ export async function getDashboardData(
   learnerStateRepository: LearnerStateRepository,
   now = new Date(),
 ): Promise<DashboardData> {
-  const [exercises, learnerState] = await Promise.all([
+  const [exercises, curriculum, learnerState] = await Promise.all([
     exerciseRepository.listExercises(),
+    exerciseRepository.getCurriculum(),
     learnerStateRepository.load(),
   ])
   const dateKey = now.toISOString().slice(0, 10)
-
-  if (learnerState.dailyMission?.date === dateKey) {
-    return { exercises, learnerState }
-  }
-
-  const updatedState: LearnerState = {
-    ...learnerState,
-    dailyMission: buildDailyMission(
-      exercises,
-      learnerState.completedExerciseIds,
-      now,
-    ),
-    updatedAt: now.toISOString(),
-  }
+  const stateWithMission: LearnerState =
+    learnerState.dailyMission?.date === dateKey
+      ? learnerState
+      : {
+          ...learnerState,
+          dailyMission: buildDailyMission(
+            exercises,
+            learnerState.completedExerciseIds,
+            now,
+          ),
+        }
+  const updatedState = synchroniseLearnerProgress(
+    stateWithMission,
+    exercises,
+    curriculum,
+    now,
+  )
 
   await learnerStateRepository.save(updatedState)
 
-  return { exercises, learnerState: updatedState }
+  return {
+    exercises,
+    learnerState: updatedState,
+    progress: deriveLearningProgress(updatedState, exercises, curriculum, now),
+  }
 }

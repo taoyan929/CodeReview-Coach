@@ -9,7 +9,7 @@ import {
 } from '../components/review/FindingComposer'
 import { FindingList } from '../components/review/FindingList'
 import { ReviewFeedback } from '../components/review/ReviewFeedback'
-import type { Exercise } from '../domain/exercise/types'
+import type { Curriculum, Exercise } from '../domain/exercise/types'
 import type {
   ExerciseAttempt,
   HintUsage,
@@ -22,10 +22,13 @@ import { formatLabel } from '../utils/formatLabel'
 
 interface ChallengeLoaderData {
   exercise: Exercise
+  exercises: Exercise[]
+  curriculum: Curriculum
 }
 
 export function ChallengePage() {
-  const { exercise } = useLoaderData() as ChallengeLoaderData
+  const { exercise, exercises, curriculum } =
+    useLoaderData() as ChallengeLoaderData
   const [activeFileId, setActiveFileId] = useState(exercise.files[0]?.id ?? '')
   const [selectedLines, setSelectedLines] = useState<number[]>([])
   const [findings, setFindings] = useState<LearnerFinding[]>([])
@@ -139,7 +142,13 @@ export function ChallengePage() {
         exercise={exercise}
         onSubmit={async (files) => {
           const completedAttempt = await completeExerciseAttempt(
-            { attemptId: submittedAttempt.id, exercise, files },
+            {
+              attemptId: submittedAttempt.id,
+              exercise,
+              files,
+              exercises,
+              curriculum,
+            },
             learnerStateRepository,
           )
           setSubmittedAttempt(completedAttempt)

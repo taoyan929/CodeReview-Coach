@@ -22,15 +22,19 @@ export const router = createBrowserRouter([
       {
         path: 'challenge/:exerciseId',
         loader: async ({ params }) => {
-          const exercise = params.exerciseId
-            ? await exerciseRepository.getExercise(params.exerciseId)
-            : null
+          const [exercise, exercises, curriculum] = await Promise.all([
+            params.exerciseId
+              ? exerciseRepository.getExercise(params.exerciseId)
+              : null,
+            exerciseRepository.listExercises(),
+            exerciseRepository.getCurriculum(),
+          ])
 
           if (!exercise) {
             throw new Response('Exercise not found', { status: 404 })
           }
 
-          return { exercise }
+          return { exercise, exercises, curriculum }
         },
         element: <ChallengePage />,
         errorElement: <NotFoundPage />,

@@ -1,4 +1,4 @@
-> Status: Implemented for review scoring · Last reviewed: 2026-09-05 · Imported from [Linear](https://linear.app/taoyan929/document/03-learning-scoring-and-adaptive-model-716ed7acf5b5).
+> Status: Implemented for review scoring and deterministic progress · Last reviewed: 2026-09-05 · Imported from [Linear](https://linear.app/taoyan929/document/03-learning-scoring-and-adaptive-model-716ed7acf5b5).
 >
 > Repository Markdown is the implementation reference. Material product changes should be reflected in both this document and the matching Linear issue or project document.
 
@@ -162,6 +162,20 @@ Mastery can exist at:
 
 Avoid claiming mastery is a real-world engineering certification; it is an in-product learning metric.
 
+### Implemented mastery calculation
+
+Each scored attempt contributes an in-product mastery score from 0–100:
+
+| Signal | Contribution |
+| --- | ---: |
+| Deterministic technical score | 75% |
+| Independent work (inverse of strongest hint level) | 10% |
+| Submitted code fix | 15% |
+
+Overall, track and learning-level mastery are averages of matching scored attempts. Primary and secondary exercise tracks both receive the signal. Mastery remains `undefined` until at least one matching attempt exists; the UI must show insufficient data rather than 0%.
+
+Curriculum completion is calculated independently from completed exercise weights against the curriculum's configured total. A low mastery score never removes completion.
+
 ## 9. Weak-topic model
 
 A concept becomes weak when deterministic thresholds are met, for example:
@@ -172,6 +186,10 @@ A concept becomes weak when deterministic thresholds are met, for example:
 * failed fix step
 
 Weak status should decay/remove after successful later practice.
+
+The implemented deterministic weak threshold is mastery below 70 for a concept that has been missed at least once. Priority increases as mastery falls and miss count rises. Tracks with measured mastery below 70 are surfaced separately. These rules are domain constants and can be calibrated without changing page components.
+
+Streaks use unique UTC completion dates. The current streak remains active when the last completion was today or yesterday. Weekly goals start on Monday, default to five completed fixes, and preserve a learner's target for the active week.
 
 ## 10. Rule-based recommendations
 
