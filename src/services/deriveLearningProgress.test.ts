@@ -1,5 +1,6 @@
 import { mvpCurriculum } from '../data/curriculum'
 import { reactDerivedStateExercise } from '../data/exercises/reactDerivedState'
+import { starterExercisePack } from '../data/exercises/starterExercisePack'
 import type { ExerciseAttempt, LearnerState } from '../domain/learning/types'
 import { createInitialLearnerState } from '../domain/learning/types'
 import {
@@ -41,6 +42,23 @@ function progressFor(
   )
 }
 
+function completedAttemptFor(
+  exerciseId: string,
+  index: number,
+): ExerciseAttempt {
+  return attempt({
+    id: `completed-${index}`,
+    exerciseId,
+    submittedAt: `2026-09-0${(index % 5) + 1}T10:00:00.000Z`,
+    completedAt: `2026-09-0${(index % 5) + 1}T10:05:00.000Z`,
+    evaluation: {
+      ...attempt().evaluation!,
+      technicalScore: 95,
+      completed: true,
+    },
+  })
+}
+
 describe('deriveLearningProgress', () => {
   it('shows every planned track and learning level before there is activity', () => {
     const progress = progressFor(createInitialLearnerState())
@@ -50,7 +68,7 @@ describe('deriveLearningProgress', () => {
     expect(progress.curriculumCompletion).toBe(0)
     expect(progress.reviewMastery).toBeUndefined()
     expect(progress.byTrack.find(({ id }) => id === 'react')).toMatchObject({
-      status: 'available',
+      status: 'locked',
       totalExercises: 1,
     })
     expect(progress.byTrack.find(({ id }) => id === 'python')).toMatchObject({
@@ -177,5 +195,74 @@ describe('deriveLearningProgress', () => {
         'track:typescript',
       ]),
     )
+  })
+
+  it('unlocks Level 2 and Level 3 only after sufficient earlier progress', () => {
+    const exercises = [reactDerivedStateExercise, ...starterExercisePack]
+    const literacy = exercises
+      .filter(({ level }) => level === 'literacy')
+      .slice(0, 3)
+    const levelTwoState = createInitialLearnerState()
+    levelTwoState.completedExerciseIds = literacy.map(({ id }) => id)
+    levelTwoState.attempts = literacy.map(({ id }, index) =>
+      completedAttemptFor(id, index),
+    )
+
+    const levelTwoProgress = deriveLearningProgress(
+      levelTwoState,
+      exercises,
+      mvpCurriculum,
+      new Date('2026-09-05T12:00:00.000Z'),
+    )
+
+    expect(levelTwoProgress.unlocks).toContain('level:technology-review')
+    expect(levelTwoProgress.unlocks).not.toContain(
+      'level:software-engineering-review',
+    )
+
+    const technology = exercises
+      .filter(({ level }) => level === 'technology-review')
+      .slice(0, 5)
+    const levelThreeState = createInitialLearnerState()
+    levelThreeState.completedExerciseIds = technology.map(({ id }) => id)
+    levelThreeState.attempts = technology.map(({ id }, index) =>
+      completedAttemptFor(id, index),
+    )
+
+    const levelThreeProgress = deriveLearningProgress(
+      levelThreeState,
+      exercises,
+      mvpCurriculum,
+      new Date('2026-09-05T12:00:00.000Z'),
+    )
+
+    expect(levelThreeProgress.unlocks).toContain(
+      'level:software-engineering-review',
+    )
+    expect(levelThreeProgress.bossReviewStatus).toBe('locked')
+  })
+
+  it('unlocks the Boss Review after broad completion and strong mastery', () => {
+    const exercises = [reactDerivedStateExercise, ...starterExercisePack]
+    const completed = exercises.filter(
+      ({ missionType }) => missionType !== 'boss-review',
+    )
+    const state = createInitialLearnerState()
+    state.completedExerciseIds = completed.map(({ id }) => id)
+    state.attempts = completed.map(({ id }, index) =>
+      completedAttemptFor(id, index),
+    )
+
+    const progress = deriveLearningProgress(
+      state,
+      exercises,
+      mvpCurriculum,
+      new Date('2026-09-05T12:00:00.000Z'),
+    )
+
+    expect(progress.curriculumCompletion).toBeGreaterThanOrEqual(50)
+    expect(progress.reviewMastery).toBeGreaterThanOrEqual(70)
+    expect(progress.bossReviewStatus).toBe('available')
+    expect(progress.unlocks).toContain('mission:boss-review')
   })
 })

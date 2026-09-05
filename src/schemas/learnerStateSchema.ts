@@ -83,6 +83,13 @@ const attemptSchema = z.object({
     .optional(),
 })
 
+const recommendationSchema = z.object({
+  exerciseId: z.string().min(1),
+  score: z.number(),
+  reasonCode: z.string().min(1),
+  reasonText: z.string().min(1),
+})
+
 export const learnerStateSchema = z.object({
   schemaVersion: z.literal(LEARNER_STATE_SCHEMA_VERSION),
   profile: z.object({
@@ -120,6 +127,7 @@ export const learnerStateSchema = z.object({
       exerciseIds: z.array(z.string()),
       completedExerciseIds: z.array(z.string()),
       estimatedMinutes: z.number().int().nonnegative(),
+      recommendations: z.array(recommendationSchema),
     })
     .optional(),
   weeklyGoal: z
@@ -158,9 +166,9 @@ export function migrateLearnerState(input: unknown): LearnerState {
   }
 
   if (input.schemaVersion === 2 && Array.isArray(input.attempts)) {
-    return parseLearnerState({
+    return migrateLearnerState({
       ...input,
-      schemaVersion: LEARNER_STATE_SCHEMA_VERSION,
+      schemaVersion: 3,
       attempts: input.attempts.map((attempt) => {
         if (!isRecord(attempt) || !Array.isArray(attempt.findings)) {
           return attempt
@@ -178,6 +186,28 @@ export function migrateLearnerState(input: unknown): LearnerState {
           }),
         }
       }),
+    })
+  }
+
+  if (input.schemaVersion === 3) {
+    const dailyMission = isRecord(input.dailyMission)
+      ? {
+          ...input.dailyMission,
+          recommendations: Array.isArray(input.dailyMission.exerciseIds)
+            ? input.dailyMission.exerciseIds.map((exerciseId) => ({
+                exerciseId,
+                score: 0,
+                reasonCode: 'legacy-mission',
+                reasonText: 'Continue your existing daily mission.',
+              }))
+            : [],
+        }
+      : input.dailyMission
+
+    return parseLearnerState({
+      ...input,
+      schemaVersion: LEARNER_STATE_SCHEMA_VERSION,
+      dailyMission,
     })
   }
 

@@ -98,6 +98,7 @@ export interface MissionState {
   exerciseIds: string[]
   completedExerciseIds: string[]
   estimatedMinutes: number
+  recommendations: Recommendation[]
 }
 
 export interface WeeklyGoalState {
@@ -159,7 +160,7 @@ export interface LearnerStateRepository {
   reset(): Promise<void>
 }
 
-export const LEARNER_STATE_SCHEMA_VERSION = 3
+export const LEARNER_STATE_SCHEMA_VERSION = 4
 
 export function createInitialLearnerState(now = new Date()): LearnerState {
   const timestamp = now.toISOString()

@@ -70,8 +70,8 @@ Build the product in vertical slices, but keep the domain/data contracts stable 
 
 ### Primary issues
 
-* [TAO-23](https://linear.app/taoyan929/issue/TAO-23/build-curriculum-progress-mastery-and-weak-topic-tracking) Progress/mastery/weak topics
-* [TAO-25](https://linear.app/taoyan929/issue/TAO-25/implement-rule-based-adaptive-learning-path-and-daily-recommendations) Rule-based adaptive path
+* [TAO-23](https://linear.app/taoyan929/issue/TAO-23/build-curriculum-progress-mastery-and-weak-topic-tracking) Progress/mastery/weak topics ✅
+* [TAO-25](https://linear.app/taoyan929/issue/TAO-25/implement-rule-based-adaptive-learning-path-and-daily-recommendations) Rule-based adaptive path ✅
 * [TAO-26](https://linear.app/taoyan929/issue/TAO-26/add-developer-style-missions-streaks-and-boss-reviews) Missions/streaks/Boss Reviews
 * [TAO-24](https://linear.app/taoyan929/issue/TAO-24/polish-test-and-prepare-mvp-release) MVP quality/release
 

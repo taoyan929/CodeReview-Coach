@@ -110,7 +110,7 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 
 ## Development status
 
-- Project status: M1 and M2 complete; TAO-23 progress tracking complete; M3 adaptation next
+- Project status: M1 and M2 complete; TAO-23 progress tracking and TAO-25 deterministic adaptation complete
 - M1–M5 milestones: defined
 - Application scaffold: complete
 - Exercise and learner-state contracts: initial version implemented
@@ -120,7 +120,8 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 - Deterministic scoring: finding-level technical dimensions, separate communication score, assistance tracking, staged feedback, and final reveal implemented
 - Fix practice: editable working copy, learner-gated reference comparison, structured fix submission, and completion transition implemented
 - Progress tracking: separate curriculum completion and mastery, all-track/all-level breakdowns, weak areas, activity history, streaks, daily/weekly goals, unlock states, and reset implemented
-- Current recommended work: build TAO-25 rule-based recommendations from the completed curriculum and progress signals
+- Adaptive path: explainable 1–3 item Daily Missions use prerequisites, level gates, weak concepts, recent results, hint independence, preferred tracks, difficulty, recency, and mission-format rotation
+- Current recommended work: deepen developer-style missions and Boss Review progression in TAO-26
 
 ## License
 

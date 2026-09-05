@@ -61,6 +61,14 @@ export function DashboardPage() {
   const revalidator = useRevalidator()
   const [isConfirmingReset, setIsConfirmingReset] = useState(false)
   const [isResetting, setIsResetting] = useState(false)
+  const missionItems = (learnerState.dailyMission?.recommendations ?? [])
+    .map((recommendation) => {
+      const exercise = exercises.find(
+        ({ id }) => id === recommendation.exerciseId,
+      )
+      return exercise ? { exercise, recommendation } : undefined
+    })
+    .filter((item): item is NonNullable<typeof item> => Boolean(item))
   const missionExercise = learnerState.dailyMission?.exerciseIds
     .filter(
       (id) => !learnerState.dailyMission?.completedExerciseIds.includes(id),
@@ -89,12 +97,13 @@ export function DashboardPage() {
     : progress.curriculumCompletion === 100
       ? 'All available work complete'
       : 'No mission scheduled'
-  const remainingMissionMinutes = missionTotal
-    ? Math.round(
-        ((missionTotal - missionCompleted) / missionTotal) *
-          (learnerState.dailyMission?.estimatedMinutes ?? 0),
-      )
-    : 0
+  const remainingMissionMinutes = missionItems.reduce(
+    (total, { exercise }) =>
+      learnerState.dailyMission?.completedExerciseIds.includes(exercise.id)
+        ? total
+        : total + exercise.estimatedMinutes,
+    0,
+  )
   const weeklyProgress = Math.min(
     100,
     Math.round(
@@ -195,11 +204,54 @@ export function DashboardPage() {
           <div className="mt-6">
             <ProgressBar value={missionProgress} />
           </div>
-          <p className="mt-4 text-sm leading-6 text-paper/50">
-            {missionProgress === 100
-              ? 'Mission complete. The next set will be prepared from your learning history.'
-              : 'Finish the review and code-fix steps to complete a mission item.'}
-          </p>
+          {missionItems.length > 0 ? (
+            <ol className="mt-5 space-y-3">
+              {missionItems.map(({ exercise, recommendation }, index) => {
+                const isComplete = Boolean(
+                  learnerState.dailyMission?.completedExerciseIds.includes(
+                    exercise.id,
+                  ),
+                )
+
+                return (
+                  <li
+                    className="rounded-2xl border border-white/10 bg-black/10 p-4"
+                    key={exercise.id}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span
+                        className={`mt-0.5 font-mono text-[10px] ${isComplete ? 'text-mint' : 'text-paper/35'}`}
+                      >
+                        {isComplete ? 'DONE' : `0${index + 1}`}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <Link
+                          className="font-semibold transition hover:text-mint"
+                          to={`/challenge/${exercise.id}`}
+                        >
+                          {exercise.title}
+                        </Link>
+                        <p className="mt-1 text-xs leading-5 text-paper/50">
+                          {recommendation.reasonText}
+                        </p>
+                        <p className="mt-2 font-mono text-[9px] text-paper/30 uppercase">
+                          {formatLabel(exercise.track)} · difficulty{' '}
+                          {exercise.difficulty} · {exercise.estimatedMinutes}{' '}
+                          min
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+                )
+              })}
+            </ol>
+          ) : (
+            <p className="mt-4 text-sm leading-6 text-paper/50">
+              {missionProgress === 100
+                ? 'Mission complete. The next set will be prepared from your learning history.'
+                : 'No eligible mission items are available yet.'}
+            </p>
+          )}
         </article>
 
         <article className="rounded-3xl border border-white/10 bg-white/[0.025] p-6">
@@ -234,8 +286,8 @@ export function DashboardPage() {
             </h2>
           </div>
           <p className="max-w-md text-sm leading-6 text-paper/45">
-            Locked tracks are part of the planned MVP curriculum and will open
-            as validated exercises are added.
+            Track access follows the learning-level gates. Strong completion and
+            mastery open the next stage.
           </p>
         </div>
 

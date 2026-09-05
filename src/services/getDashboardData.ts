@@ -10,6 +10,7 @@ import {
   synchroniseLearnerProgress,
   type LearningProgressSnapshot,
 } from './deriveLearningProgress'
+import { recommendExercises } from './recommendExercises'
 
 export interface DashboardData {
   exercises: Exercise[]
@@ -28,17 +29,39 @@ export async function getDashboardData(
     learnerStateRepository.load(),
   ])
   const dateKey = now.toISOString().slice(0, 10)
-  const stateWithMission: LearnerState =
-    learnerState.dailyMission?.date === dateKey
-      ? learnerState
-      : {
-          ...learnerState,
-          dailyMission: buildDailyMission(
+  const synchronisedState = synchroniseLearnerProgress(
+    learnerState,
+    exercises,
+    curriculum,
+    now,
+  )
+  const progress = deriveLearningProgress(
+    synchronisedState,
+    exercises,
+    curriculum,
+    now,
+  )
+  const hasCurrentRecommendations =
+    synchronisedState.dailyMission?.date === dateKey &&
+    synchronisedState.dailyMission.recommendations.length > 0 &&
+    synchronisedState.dailyMission.recommendations.every(
+      ({ reasonCode }) => reasonCode !== 'legacy-mission',
+    )
+  const stateWithMission: LearnerState = hasCurrentRecommendations
+    ? synchronisedState
+    : {
+        ...synchronisedState,
+        dailyMission: buildDailyMission(
+          exercises,
+          recommendExercises({
             exercises,
-            learnerState.completedExerciseIds,
+            learnerState: synchronisedState,
+            progress,
             now,
-          ),
-        }
+          }),
+          now,
+        ),
+      }
   const updatedState = synchroniseLearnerProgress(
     stateWithMission,
     exercises,

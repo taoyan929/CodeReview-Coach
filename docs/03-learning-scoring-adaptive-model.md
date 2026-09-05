@@ -1,4 +1,4 @@
-> Status: Implemented for review scoring and deterministic progress · Last reviewed: 2026-09-05 · Imported from [Linear](https://linear.app/taoyan929/document/03-learning-scoring-and-adaptive-model-716ed7acf5b5).
+> Status: Implemented for review scoring, deterministic progress, and adaptive recommendations · Last reviewed: 2026-09-05 · Imported from [Linear](https://linear.app/taoyan929/document/03-learning-scoring-and-adaptive-model-716ed7acf5b5).
 >
 > Repository Markdown is the implementation reference. Material product changes should be reflected in both this document and the matching Linear issue or project document.
 
@@ -214,6 +214,8 @@ Example rules:
 6. Weak topic stale for several days → bring back into Daily Mission.
 7. Rotate mission types to avoid monotony.
 
+The implemented `recommendExercises` boundary is a pure, deterministic ranking function. It filters locked exercises and unmet prerequisites before scoring eligible work, caps output at three tasks, and returns a stable `Recommendation` contract with a machine-readable reason code and learner-facing explanation. Completed work is only eligible again when it reinforces a current weak concept.
+
 ## 11. Daily Mission generation
 
 Create 1–3 tasks balancing:
@@ -224,6 +226,8 @@ Create 1–3 tasks balancing:
 * estimated time
 
 Each recommendation should have an explainable reason.
+
+The generated mission persists the ranked recommendations alongside its exercise IDs. The Dashboard uses those persisted reasons and calculates remaining time from incomplete mission items rather than estimating proportionally.
 
 ## 12. Weekly Goal
 
@@ -241,9 +245,9 @@ Weekly summary:
 Example design, configurable later:
 
 * Level 1 available by default
-* Level 2 unlocks after required foundation completion and minimum mastery
-* Level 3 unlocks after sufficient Level 2 coverage/mastery
-* Boss Reviews unlock at curriculum checkpoints
+* Level 2 unlocks at 30% Code Literacy completion and 65% mastery, or when compatible prior Level 2 activity already exists
+* Level 3 unlocks at 35% Technology Review completion and 70% mastery, or when compatible prior Level 3 activity already exists
+* Boss Reviews unlock after Level 3 is available, curriculum completion reaches 50%, and overall review mastery reaches 70%
 
 Avoid hard-coding thresholds into page components.
 

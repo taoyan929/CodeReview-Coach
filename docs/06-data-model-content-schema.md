@@ -161,7 +161,7 @@ interface LearnerFinding {
 }
 ```
 
-`locations` stores one or more independently selected lines/ranges. This allows a single review finding to reference non-adjacent lines without treating every intervening line as selected. Learner-state schema version 3 migrates the former singular `location` field into a one-item `locations` array.
+`locations` stores one or more independently selected lines/ranges. This allows a single review finding to reference non-adjacent lines without treating every intervening line as selected. Learner-state schema version 3 migrates the former singular `location` field into a one-item `locations` array. Version 4 adds persisted recommendation metadata to each Daily Mission and migrates active version 3 missions with a legacy reason before they are refreshed by the Dashboard loader.
 
 Advanced mode may omit category and use a free-form comment while mapping into the same model.
 
@@ -255,6 +255,7 @@ interface MissionState {
   exerciseIds: string[];
   completedExerciseIds: string[];
   estimatedMinutes: number;
+  recommendations: Recommendation[];
 }
 ```
 

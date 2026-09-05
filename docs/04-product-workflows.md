@@ -126,7 +126,7 @@ On completion:
 8. Re-run recommendation engine.
 9. Show result/celebration and next CTA.
 
-TAO-23 implements steps 1–7 with a deterministic progress snapshot persisted through the learner-state repository. The Dashboard presents completion and mastery separately, all configured tracks and learning levels, weak concepts/tracks, recent attempts, streaks, mission/weekly-goal progress, unlock state, and a two-step local reset. Step 8 is the TAO-25 recommendation engine.
+TAO-23 implements steps 1–7 with a deterministic progress snapshot persisted through the learner-state repository. TAO-25 implements step 8 with a pure recommendation boundary and persists an explainable 1–3 task Daily Mission. The Dashboard presents completion and mastery separately, all configured tracks and learning levels, weak concepts/tracks, recent attempts, streaks, mission/weekly-goal progress, unlock state, recommendation reasons, and a two-step local reset.
 
 ## 8. Daily Mission workflow
 

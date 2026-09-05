@@ -78,6 +78,14 @@ describe('completeExerciseAttempt', () => {
       exerciseIds: [reactDerivedStateExercise.id],
       completedExerciseIds: [],
       estimatedMinutes: 12,
+      recommendations: [
+        {
+          exerciseId: reactDerivedStateExercise.id,
+          score: 100,
+          reasonCode: 'next-foundation',
+          reasonText: 'Start here.',
+        },
+      ],
     }
     const repository = new MemoryLearnerStateRepository(state)
     const fixedFiles = reactDerivedStateExercise.files.map((file) => ({

@@ -25,6 +25,14 @@ function renderDashboard() {
     exerciseIds: [reactDerivedStateExercise.id],
     completedExerciseIds: [],
     estimatedMinutes: 12,
+    recommendations: [
+      {
+        exerciseId: reactDerivedStateExercise.id,
+        score: 100,
+        reasonCode: 'weak-concept',
+        reasonText: 'You missed derived state twice recently.',
+      },
+    ],
   }
   const progress = deriveLearningProgress(
     learnerState,
@@ -60,6 +68,9 @@ describe('DashboardPage', () => {
     ).toBeVisible()
     expect(
       screen.getByRole('heading', { name: 'Full-Stack Boss Review' }),
+    ).toBeVisible()
+    expect(
+      screen.getByText('You missed derived state twice recently.'),
     ).toBeVisible()
   })
 

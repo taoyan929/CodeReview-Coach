@@ -12,7 +12,7 @@ export function AppShell() {
             CodeReview Coach
           </Link>
           <span className="rounded-full border border-mint/30 bg-mint/10 px-3 py-1 font-mono text-xs text-mint">
-            M3 progress preview
+            M3 adaptive path
           </span>
         </div>
       </header>

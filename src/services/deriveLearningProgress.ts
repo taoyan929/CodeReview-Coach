@@ -273,13 +273,34 @@ function buildWeakConcepts(scored: ScoredAttempt[]): WeakConceptState[] {
 
 function collectUnlocks(
   exercises: Exercise[],
+  byLevel: ProgressBreakdown<LearningLevel>[],
+  scored: ScoredAttempt[],
   curriculumCompletion: number,
   reviewMastery?: number,
 ) {
   const unlocks = new Set<string>(['level:literacy'])
+  const literacy = byLevel.find(({ id }) => id === 'literacy')
+  const technology = byLevel.find(({ id }) => id === 'technology-review')
+  const hasStarted = (level: LearningLevel) =>
+    scored.some(({ exercise }) => exercise.level === level)
 
-  for (const exercise of exercises) {
-    unlocks.add(`level:${exercise.level}`)
+  if (
+    hasStarted('technology-review') ||
+    ((literacy?.completion ?? 0) >= 30 && (literacy?.mastery ?? 0) >= 65)
+  ) {
+    unlocks.add('level:technology-review')
+  }
+
+  if (
+    hasStarted('software-engineering-review') ||
+    ((technology?.completion ?? 0) >= 35 && (technology?.mastery ?? 0) >= 70)
+  ) {
+    unlocks.add('level:software-engineering-review')
+  }
+
+  for (const exercise of exercises.filter(({ level }) =>
+    unlocks.has(`level:${level}`),
+  )) {
     unlocks.add(`track:${exercise.track}`)
     exercise.secondaryTracks?.forEach((track) => unlocks.add(`track:${track}`))
   }
@@ -289,6 +310,7 @@ function collectUnlocks(
   )
   if (
     hasBossReview &&
+    unlocks.has('level:software-engineering-review') &&
     curriculumCompletion >= 50 &&
     (reviewMastery ?? 0) >= 70
   ) {
@@ -319,7 +341,7 @@ export function deriveLearningProgress(
       : 0
   const reviewMastery = average(scored.map(({ masteryScore }) => masteryScore))
 
-  const byTrack = tracks.map((track) => {
+  const rawByTrack = tracks.map((track) => {
     const trackExercises = exercises.filter((exercise) =>
       trackMatches(exercise, track),
     )
@@ -342,7 +364,7 @@ export function deriveLearningProgress(
     }
   })
 
-  const byLevel = learningLevels.map((level) => {
+  const rawByLevel = learningLevels.map((level) => {
     const levelExercises = exercises.filter(
       (exercise) => exercise.level === level,
     )
@@ -361,21 +383,46 @@ export function deriveLearningProgress(
         completedExerciseIds.has(id),
       ).length,
       totalExercises: levelExercises.length,
-      status:
-        level === 'literacy' && levelExercises.length === 0
-          ? 'available'
-          : progressStatus(levelExercises.length, completion),
+      status: progressStatus(levelExercises.length, completion),
     }
   })
 
   const weakConcepts = buildWeakConcepts(scored)
+  const unlocks = collectUnlocks(
+    exercises,
+    rawByLevel,
+    scored,
+    curriculumCompletion,
+    reviewMastery,
+  )
+  const byLevel = rawByLevel.map((level) => ({
+    ...level,
+    status:
+      level.completion === 100
+        ? ('complete' as const)
+        : level.completion > 0
+          ? ('in-progress' as const)
+          : unlocks.includes(`level:${level.id}`)
+            ? ('available' as const)
+            : ('locked' as const),
+  }))
+  const byTrack = rawByTrack.map((track) => ({
+    ...track,
+    status:
+      track.completion === 100
+        ? ('complete' as const)
+        : track.completion > 0
+          ? ('in-progress' as const)
+          : unlocks.includes(`track:${track.id}`)
+            ? ('available' as const)
+            : ('locked' as const),
+  }))
   const weakTracks = byTrack
     .filter(
       ({ mastery }) =>
         mastery !== undefined && mastery < WEAK_MASTERY_THRESHOLD,
     )
     .map(({ id }) => id)
-  const unlocks = collectUnlocks(exercises, curriculumCompletion, reviewMastery)
   const bossReviewStatus = unlocks.includes('mission:boss-review')
     ? 'available'
     : 'locked'

@@ -100,6 +100,37 @@ describe('LocalStorageLearnerStateRepository', () => {
     ])
   })
 
+  it('migrates version 3 missions to explainable recommendations', async () => {
+    const currentState = createInitialLearnerState(
+      new Date('2026-09-05T00:00:00.000Z'),
+    )
+    const legacyState = {
+      ...currentState,
+      schemaVersion: 3,
+      dailyMission: {
+        date: '2026-09-05',
+        exerciseIds: ['react-derived-state-01'],
+        completedExerciseIds: [],
+        estimatedMinutes: 12,
+      },
+    }
+    window.localStorage.setItem('test-state', JSON.stringify(legacyState))
+    const repository = new LocalStorageLearnerStateRepository(
+      window.localStorage,
+      'test-state',
+    )
+
+    const migratedState = await repository.load()
+
+    expect(migratedState.schemaVersion).toBe(LEARNER_STATE_SCHEMA_VERSION)
+    expect(migratedState.dailyMission?.recommendations).toEqual([
+      expect.objectContaining({
+        exerciseId: 'react-derived-state-01',
+        reasonCode: 'legacy-mission',
+      }),
+    ])
+  })
+
   it('rejects unsupported state instead of silently resetting it', async () => {
     window.localStorage.setItem(
       'test-state',

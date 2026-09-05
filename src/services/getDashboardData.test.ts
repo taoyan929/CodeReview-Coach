@@ -44,12 +44,18 @@ describe('getDashboardData', () => {
     expect(result.learnerState.dailyMission).toMatchObject({
       date: '2026-09-05',
       exerciseIds: [
-        reactDerivedStateExercise.id,
         'javascript-strict-equality-01',
         'javascript-map-return-01',
+        'typescript-optional-name-01',
       ],
       completedExerciseIds: [],
     })
+    expect(result.learnerState.dailyMission?.recommendations).toHaveLength(3)
+    expect(
+      result.learnerState.dailyMission?.recommendations.every(
+        ({ reasonText }) => reasonText.length > 0,
+      ),
+    ).toBe(true)
     expect(result.progress.byTrack).toHaveLength(10)
     expect(result.progress.byLevel).toHaveLength(3)
     expect(learnerStateRepository.state.weeklyGoal).toMatchObject({
@@ -57,6 +63,6 @@ describe('getDashboardData', () => {
       targetExercises: 5,
       completedExercises: 0,
     })
-    expect(learnerStateRepository.state.unlocks).toContain('track:react')
+    expect(learnerStateRepository.state.unlocks).toContain('track:javascript')
   })
 })
