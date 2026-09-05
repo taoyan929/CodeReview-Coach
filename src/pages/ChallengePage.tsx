@@ -109,7 +109,7 @@ export function ChallengePage() {
     }
   }
 
-  function retryExercise(nextHints = hintsUsed) {
+  function retryExercise(nextHints: HintUsage[]) {
     setActiveFileId(exercise.files[0]?.id ?? '')
     setSelectedLines([])
     setFindings([])
@@ -118,6 +118,10 @@ export function ChallengePage() {
     setSubmittedAttempt(undefined)
     setIsFixing(false)
     setSubmitError(undefined)
+  }
+
+  function retryWithoutHint() {
+    retryExercise(hintsUsed)
   }
 
   function retryWithHint() {
@@ -164,7 +168,7 @@ export function ChallengePage() {
         attempt={submittedAttempt}
         canRequestHint={Boolean(nextHint)}
         exercise={exercise}
-        onRetry={retryExercise}
+        onRetry={retryWithoutHint}
         onRetryWithHint={retryWithHint}
         onStartFix={() => setIsFixing(true)}
       />
