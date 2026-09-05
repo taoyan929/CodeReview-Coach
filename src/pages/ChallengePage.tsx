@@ -86,7 +86,7 @@ export function ChallengePage() {
     try {
       const attempt = await submitReviewAttempt(
         {
-          exerciseId: exercise.id,
+          exercise,
           startedAt,
           findings,
           hintsUsed,
@@ -103,22 +103,39 @@ export function ChallengePage() {
     }
   }
 
-  function retryExercise() {
+  function retryExercise(nextHints = hintsUsed) {
     setActiveFileId(exercise.files[0]?.id ?? '')
     setSelection(undefined)
     setFindings([])
-    setHintsUsed([])
+    setHintsUsed(nextHints)
     setStartedAt(new Date().toISOString())
     setSubmittedAttempt(undefined)
     setSubmitError(undefined)
+  }
+
+  function retryWithHint() {
+    if (!nextHint) {
+      return
+    }
+
+    retryExercise([
+      ...hintsUsed,
+      {
+        expectedFindingId: exercise.expectedFindings[0]?.id,
+        level: nextHint.level,
+        usedAt: new Date().toISOString(),
+      },
+    ])
   }
 
   if (submittedAttempt) {
     return (
       <ReviewFeedback
         attempt={submittedAttempt}
+        canRequestHint={Boolean(nextHint)}
         exercise={exercise}
         onRetry={retryExercise}
+        onRetryWithHint={retryWithHint}
       />
     )
   }

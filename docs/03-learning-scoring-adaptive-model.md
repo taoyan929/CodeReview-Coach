@@ -1,4 +1,4 @@
-> Status: Draft · Last reviewed: 2026-09-04 · Imported from [Linear](https://linear.app/taoyan929/document/03-learning-scoring-and-adaptive-model-716ed7acf5b5).
+> Status: Implemented for review scoring · Last reviewed: 2026-09-05 · Imported from [Linear](https://linear.app/taoyan929/document/03-learning-scoring-and-adaptive-model-716ed7acf5b5).
 >
 > Repository Markdown is the implementation reference. Material product changes should be reflected in both this document and the matching Linear issue or project document.
 
@@ -92,6 +92,31 @@ Per finding, store dimension scores rather than only one grade:
 Exercise technical score can use weighted findings by severity/importance.
 
 Exact weights should be constants/configuration, not embedded in UI components.
+
+### Implemented MVP rules
+
+The deterministic engine uses these technical weights per expected finding:
+
+| Dimension | Weight |
+| --- | ---: |
+| Detection / accepted location overlap | 35% |
+| Category / accepted adjacent category | 15% |
+| Diagnosis / concept recognition | 25% |
+| Reasoning / consequence recognition | 15% |
+| Suggested fix / root-cause correction | 10% |
+
+Finding status thresholds are:
+
+- **Strong:** weighted finding score ≥ 0.75
+- **Partial / needs another look:** weighted finding score ≥ 0.35
+- **Incorrect:** weighted finding score < 0.35
+- **Missed:** no learner finding matches the expected finding
+
+A learner finding can match an expected finding when either its file and line range overlap an accepted location, or its accepted category and diagnosis concept signals are both strong. Expected and learner text is normalised into significant tokens; at least two tokens from a curated concept phrase must match. Exact sentence matching is never required.
+
+The exercise technical score is the expected-finding-weighted total, reported from 0–100. Communication is calculated and stored separately using diagnosis clarity, impact specificity, and fix actionability; it is never included in the technical score.
+
+Assistance level records the strongest hint level divided by three. Review submission does not mark curriculum completion: completion remains pending until the learner performs the fix step introduced by TAO-22.
 
 ## 6. Hint handling
 
@@ -217,4 +242,3 @@ AI should not replace:
 * deterministic fallback
 
 This preserves explainability and prevents the product from becoming dependent on one model response.
-

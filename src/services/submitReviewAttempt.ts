@@ -5,9 +5,10 @@ import type {
   LearnerFinding,
   LearnerStateRepository,
 } from '../domain/learning/types'
+import { evaluateReview } from '../domain/scoring/scoringEngine'
 
 export interface SubmitReviewInput {
-  exerciseId: Exercise['id']
+  exercise: Exercise
   startedAt: string
   findings: LearnerFinding[]
   hintsUsed: HintUsage[]
@@ -27,11 +28,12 @@ export async function submitReviewAttempt(
   const submittedAt = now.toISOString()
   const attempt: ExerciseAttempt = {
     id: createId(),
-    exerciseId: input.exerciseId,
+    exerciseId: input.exercise.id,
     startedAt: input.startedAt,
     submittedAt,
     findings: input.findings,
     hintsUsed: input.hintsUsed,
+    evaluation: evaluateReview(input.exercise, input.findings, input.hintsUsed),
   }
 
   await learnerStateRepository.save({

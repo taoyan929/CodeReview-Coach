@@ -16,3 +16,5 @@ The project follows the principles of [Keep a Changelog](https://keepachangelog.
 - Foundation Dashboard and read-only Challenge route.
 - Structured review workspace with selectable code lines and ranges, guided finding composition, inline comment markers, and multi-file-ready tabs.
 - Progressive hints, multi-finding review submission, retry flow, first-feedback state, and persisted exercise attempts.
+- Deterministic finding-level scoring for detection, category, diagnosis, reasoning, and suggested fixes.
+- Separate communication scoring, hint-assistance tracking, staged first feedback, and learner-controlled final reveal.

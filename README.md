@@ -96,7 +96,7 @@ dashboard
 → first-feedback state
 ```
 
-TAO-21 will add deterministic evaluation and staged feedback; TAO-22 will add the fix step and final reveal.
+Deterministic evaluation and staged feedback are now implemented. TAO-22 will add the active fix step and complete the golden exercise loop.
 
 ## Project management
 
@@ -110,7 +110,8 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 - Exercise and learner-state contracts: initial version implemented
 - Golden exercise: React derived-state review available
 - Structured review workspace: line/range selection, guided findings, progressive hints, multiple comments, submission, retry, and local attempt persistence implemented
-- Current recommended work: implement TAO-21 deterministic review scoring and staged coaching feedback
+- Deterministic scoring: finding-level technical dimensions, separate communication score, assistance tracking, staged feedback, and final reveal implemented
+- Current recommended work: implement TAO-22 fix-the-code practice and completion transition
 
 ## License
 

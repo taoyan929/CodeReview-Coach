@@ -3,6 +3,7 @@ import type {
   LearnerStateRepository,
 } from '../domain/learning/types'
 import { createInitialLearnerState } from '../domain/learning/types'
+import { reactDerivedStateExercise } from '../data/exercises/reactDerivedState'
 import { submitReviewAttempt } from './submitReviewAttempt'
 
 class MemoryLearnerStateRepository implements LearnerStateRepository {
@@ -30,7 +31,7 @@ describe('submitReviewAttempt', () => {
 
     const attempt = await submitReviewAttempt(
       {
-        exerciseId: 'react-derived-state-01',
+        exercise: reactDerivedStateExercise,
         startedAt: '2026-09-05T00:01:00.000Z',
         findings: [
           {
@@ -52,6 +53,9 @@ describe('submitReviewAttempt', () => {
     expect(attempt.id).toBe('attempt-1')
     expect(attempt.submittedAt).toBe('2026-09-05T00:03:00.000Z')
     expect(repository.state.attempts).toEqual([attempt])
+    expect(attempt.evaluation?.technicalScore).toBeGreaterThan(0)
+    expect(attempt.evaluation?.communicationScore).toBeGreaterThanOrEqual(0)
+    expect(attempt.evaluation?.completed).toBe(false)
     expect(repository.state.completedExerciseIds).toEqual([])
     expect(repository.state.curriculumCompletion).toBe(0)
   })
@@ -64,7 +68,7 @@ describe('submitReviewAttempt', () => {
     await expect(
       submitReviewAttempt(
         {
-          exerciseId: 'react-derived-state-01',
+          exercise: reactDerivedStateExercise,
           startedAt: '2026-09-05T00:01:00.000Z',
           findings: [],
           hintsUsed: [],
