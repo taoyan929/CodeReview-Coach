@@ -37,7 +37,7 @@ describe('submitReviewAttempt', () => {
           {
             id: 'finding-1',
             fileId: 'task-list',
-            location: { startLine: 15, endLine: 17 },
+            locations: [{ startLine: 15 }, { startLine: 17 }],
             category: 'logic',
             diagnosis: 'The list becomes stale when props change.',
             createdAt: '2026-09-05T00:02:00.000Z',

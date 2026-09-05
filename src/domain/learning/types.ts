@@ -18,7 +18,7 @@ export interface LearnerProfile {
 export interface LearnerFinding {
   id: string
   fileId: string
-  location: CodeLocation
+  locations: CodeLocation[]
   category?: IssueCategory
   diagnosis: string
   impact?: string
@@ -159,7 +159,7 @@ export interface LearnerStateRepository {
   reset(): Promise<void>
 }
 
-export const LEARNER_STATE_SCHEMA_VERSION = 2
+export const LEARNER_STATE_SCHEMA_VERSION = 3
 
 export function createInitialLearnerState(now = new Date()): LearnerState {
   const timestamp = now.toISOString()

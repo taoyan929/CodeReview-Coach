@@ -102,14 +102,15 @@ Desktop layout:
 
 Code interaction:
 
-* selectable line or range
+* independently selectable lines, including non-adjacent lines
+* single click adds a line; double-click removes only that selected line
 * add inline finding
 * highlight already-reviewed lines
 * multi-file-ready architecture
 
 ### Beginner finding composer
 
-* selected line/range
+* selected line(s)
 * Issue Type dropdown
 * “What did you notice?”
 * “Why does it matter?” optional
@@ -117,7 +118,7 @@ Code interaction:
 
 ### Intermediate finding composer
 
-* selected line/range
+* selected line(s)
 * free-form review comment
 * optional Category Hint / Concept Hint / Strong Hint
 
@@ -283,4 +284,3 @@ Used for self-directed practice; Today’s Mission remains the recommended defau
 * repository selector
 * team/instructor dashboard
 * interview mode
-

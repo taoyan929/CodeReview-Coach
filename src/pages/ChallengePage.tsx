@@ -8,7 +8,7 @@ import {
 } from '../components/review/FindingComposer'
 import { FindingList } from '../components/review/FindingList'
 import { ReviewFeedback } from '../components/review/ReviewFeedback'
-import type { CodeLocation, Exercise } from '../domain/exercise/types'
+import type { Exercise } from '../domain/exercise/types'
 import type {
   ExerciseAttempt,
   HintUsage,
@@ -25,7 +25,7 @@ interface ChallengeLoaderData {
 export function ChallengePage() {
   const { exercise } = useLoaderData() as ChallengeLoaderData
   const [activeFileId, setActiveFileId] = useState(exercise.files[0]?.id ?? '')
-  const [selection, setSelection] = useState<CodeLocation>()
+  const [selectedLines, setSelectedLines] = useState<number[]>([])
   const [findings, setFindings] = useState<LearnerFinding[]>([])
   const [hintsUsed, setHintsUsed] = useState<HintUsage[]>([])
   const [startedAt, setStartedAt] = useState(() => new Date().toISOString())
@@ -46,7 +46,7 @@ export function ChallengePage() {
   }
 
   function addFinding(draft: FindingDraft) {
-    if (!selection) {
+    if (selectedLines.length === 0) {
       return
     }
 
@@ -55,12 +55,12 @@ export function ChallengePage() {
       {
         id: crypto.randomUUID(),
         fileId: activeFileId,
-        location: selection,
+        locations: selectedLines.map((startLine) => ({ startLine })),
         ...draft,
         createdAt: new Date().toISOString(),
       },
     ])
-    setSelection(undefined)
+    setSelectedLines([])
     setSubmitError(undefined)
   }
 
@@ -105,7 +105,7 @@ export function ChallengePage() {
 
   function retryExercise(nextHints = hintsUsed) {
     setActiveFileId(exercise.files[0]?.id ?? '')
-    setSelection(undefined)
+    setSelectedLines([])
     setFindings([])
     setHintsUsed(nextHints)
     setStartedAt(new Date().toISOString())
@@ -253,7 +253,7 @@ export function ChallengePage() {
                 key={file.id}
                 onClick={() => {
                   setActiveFileId(file.id)
-                  setSelection(undefined)
+                  setSelectedLines([])
                 }}
                 role="tab"
                 type="button"
@@ -265,18 +265,18 @@ export function ChallengePage() {
           <CodeReviewPanel
             file={activeFile}
             findings={findings}
-            onSelect={setSelection}
-            selection={selection}
+            onSelect={setSelectedLines}
+            selectedLines={selectedLines}
           />
           <p className="mt-3 text-xs leading-5 text-paper/35">
-            Select one line, then another to extend the review range.
-            Double-click any code line to clear the selection. Added comments
-            appear as markers beside their starting line.
+            Click lines to add them individually, including non-adjacent lines.
+            Double-click a selected line to remove only that line. Added
+            comments appear as markers beside every selected line.
           </p>
         </main>
 
         <aside className="min-w-0 space-y-6">
-          <FindingComposer onAdd={addFinding} selection={selection} />
+          <FindingComposer onAdd={addFinding} selectedLines={selectedLines} />
 
           <section>
             <div className="flex items-center justify-between gap-4">

@@ -6,6 +6,7 @@ import type {
   ExerciseAttempt,
   FindingEvaluation,
 } from '../../domain/learning/types'
+import { formatCodeLocations } from '../../utils/formatCodeLocations'
 import { formatLabel } from '../../utils/formatLabel'
 
 interface ReviewFeedbackProps {
@@ -106,7 +107,8 @@ export function ReviewFeedback({
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <span className="font-mono text-[10px] text-paper/40 uppercase">
-                      Finding {index + 1} · line {finding.location.startLine}
+                      Finding {index + 1} ·{' '}
+                      {formatCodeLocations(finding.locations)}
                     </span>
                     <span
                       className={`font-mono text-[10px] uppercase ${

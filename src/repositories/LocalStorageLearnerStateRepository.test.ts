@@ -60,6 +60,46 @@ describe('LocalStorageLearnerStateRepository', () => {
     expect(migratedState.streak.activityDates).toEqual([])
   })
 
+  it('migrates version 2 finding locations into discrete selections', async () => {
+    const currentState = createInitialLearnerState(
+      new Date('2026-09-05T00:00:00.000Z'),
+    )
+    const legacyState = {
+      ...currentState,
+      schemaVersion: 2,
+      attempts: [
+        {
+          id: 'attempt-1',
+          exerciseId: 'react-derived-state-01',
+          startedAt: '2026-09-05T00:00:00.000Z',
+          findings: [
+            {
+              id: 'finding-1',
+              fileId: 'task-list',
+              location: { startLine: 15, endLine: 17 },
+              category: 'logic',
+              diagnosis: 'Derived state becomes stale.',
+              createdAt: '2026-09-05T00:01:00.000Z',
+            },
+          ],
+          hintsUsed: [],
+        },
+      ],
+    }
+    window.localStorage.setItem('test-state', JSON.stringify(legacyState))
+    const repository = new LocalStorageLearnerStateRepository(
+      window.localStorage,
+      'test-state',
+    )
+
+    const migratedState = await repository.load()
+
+    expect(migratedState.schemaVersion).toBe(LEARNER_STATE_SCHEMA_VERSION)
+    expect(migratedState.attempts[0]?.findings[0]?.locations).toEqual([
+      { startLine: 15, endLine: 17 },
+    ])
+  })
+
   it('rejects unsupported state instead of silently resetting it', async () => {
     window.localStorage.setItem(
       'test-state',

@@ -2,7 +2,6 @@ import { useState, type FormEvent } from 'react'
 
 import {
   issueCategories,
-  type CodeLocation,
   type IssueCategory,
 } from '../../domain/exercise/types'
 import { formatLabel } from '../../utils/formatLabel'
@@ -15,11 +14,14 @@ export interface FindingDraft {
 }
 
 interface FindingComposerProps {
-  selection?: CodeLocation
+  selectedLines: number[]
   onAdd: (draft: FindingDraft) => void
 }
 
-export function FindingComposer({ selection, onAdd }: FindingComposerProps) {
+export function FindingComposer({
+  selectedLines,
+  onAdd,
+}: FindingComposerProps) {
   const [category, setCategory] = useState<IssueCategory>('logic')
   const [diagnosis, setDiagnosis] = useState('')
   const [impact, setImpact] = useState('')
@@ -28,7 +30,7 @@ export function FindingComposer({ selection, onAdd }: FindingComposerProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (!selection || !diagnosis.trim()) {
+    if (selectedLines.length === 0 || !diagnosis.trim()) {
       return
     }
 
@@ -43,11 +45,12 @@ export function FindingComposer({ selection, onAdd }: FindingComposerProps) {
     setSuggestedFix('')
   }
 
-  const lineLabel = selection
-    ? selection.startLine === selection.endLine
-      ? `Line ${selection.startLine}`
-      : `Lines ${selection.startLine}–${selection.endLine}`
-    : 'Select a line or range'
+  const lineLabel =
+    selectedLines.length === 0
+      ? 'Select one or more lines'
+      : selectedLines.length === 1
+        ? `Line ${selectedLines[0]}`
+        : `Lines ${selectedLines.join(', ')}`
 
   return (
     <form
@@ -115,7 +118,7 @@ export function FindingComposer({ selection, onAdd }: FindingComposerProps) {
 
       <button
         className="mt-6 w-full rounded-full bg-paper px-5 py-3 text-sm font-semibold text-ink transition enabled:hover:bg-white disabled:cursor-not-allowed disabled:opacity-35"
-        disabled={!selection || !diagnosis.trim()}
+        disabled={selectedLines.length === 0 || !diagnosis.trim()}
         type="submit"
       >
         Add finding

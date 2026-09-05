@@ -99,7 +99,7 @@ Owns challenge content, files, expected findings, hints, prerequisites and curri
 
 ### Review domain
 
-Owns learner review findings, selected ranges, categories, diagnosis/reasoning/fix and review decisions.
+Owns learner review findings, independently selected locations, categories, diagnosis/reasoning/fix and review decisions.
 
 ### Scoring domain
 
@@ -253,4 +253,3 @@ This avoids building a separate learning system for real repositories.
 ## 14. Architecture decision summary
 
 For MVP, keep the system intentionally simple: **frontend app + domain engines + static exercises + localStorage adapters**. The sophistication belongs in the learning model, not unnecessary infrastructure.
-

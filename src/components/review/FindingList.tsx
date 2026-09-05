@@ -1,4 +1,5 @@
 import type { LearnerFinding } from '../../domain/learning/types'
+import { formatCodeLocations } from '../../utils/formatCodeLocations'
 import { formatLabel } from '../../utils/formatLabel'
 
 interface FindingListProps {
@@ -19,11 +20,7 @@ export function FindingList({ findings, onRemove }: FindingListProps) {
   return (
     <ol className="space-y-3">
       {findings.map((finding, index) => {
-        const endLine = finding.location.endLine ?? finding.location.startLine
-        const lineLabel =
-          endLine === finding.location.startLine
-            ? `Line ${finding.location.startLine}`
-            : `Lines ${finding.location.startLine}–${endLine}`
+        const lineLabel = formatCodeLocations(finding.locations)
 
         return (
           <li

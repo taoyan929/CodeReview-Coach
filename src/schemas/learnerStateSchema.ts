@@ -44,10 +44,14 @@ const evaluationSchema = z.object({
 const learnerFindingSchema = z.object({
   id: z.string().min(1),
   fileId: z.string().min(1),
-  location: z.object({
-    startLine: z.number().int().positive(),
-    endLine: z.number().int().positive().optional(),
-  }),
+  locations: z
+    .array(
+      z.object({
+        startLine: z.number().int().positive(),
+        endLine: z.number().int().positive().optional(),
+      }),
+    )
+    .min(1),
   category: z.enum(issueCategories).optional(),
   diagnosis: z.string(),
   impact: z.string().optional(),
@@ -143,13 +147,37 @@ export function migrateLearnerState(input: unknown): LearnerState {
   }
 
   if (input.schemaVersion === 1 && isRecord(input.streak)) {
-    return parseLearnerState({
+    return migrateLearnerState({
       ...input,
-      schemaVersion: LEARNER_STATE_SCHEMA_VERSION,
+      schemaVersion: 2,
       streak: {
         ...input.streak,
         activityDates: [],
       },
+    })
+  }
+
+  if (input.schemaVersion === 2 && Array.isArray(input.attempts)) {
+    return parseLearnerState({
+      ...input,
+      schemaVersion: LEARNER_STATE_SCHEMA_VERSION,
+      attempts: input.attempts.map((attempt) => {
+        if (!isRecord(attempt) || !Array.isArray(attempt.findings)) {
+          return attempt
+        }
+
+        return {
+          ...attempt,
+          findings: attempt.findings.map((finding) => {
+            if (!isRecord(finding) || !isRecord(finding.location)) {
+              return finding
+            }
+
+            const { location, ...remainingFinding } = finding
+            return { ...remainingFinding, locations: [location] }
+          }),
+        }
+      }),
     })
   }
 

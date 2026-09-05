@@ -12,7 +12,7 @@ The learner may identify the correct technical problem using imperfect English. 
 
 A learner finding can include:
 
-* line/range
+* one or more independently selected lines
 * category
 * diagnosis
 * impact/reasoning

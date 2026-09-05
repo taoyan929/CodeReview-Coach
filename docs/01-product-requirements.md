@@ -80,7 +80,7 @@ Goal: review realistic multi-file changes across Requirement → Frontend → AP
  1. Learner opens Today’s Mission.
  2. Reads requirement/context.
  3. Inspects code or diff.
- 4. Selects suspicious line/range.
+ 4. Selects one or more suspicious lines independently.
  5. Adds one or more review findings.
  6. Uses hints only if needed.
  7. Submits review.
@@ -94,7 +94,7 @@ Goal: review realistic multi-file changes across Requirement → Frontend → AP
 
 Beginner review findings may contain:
 
-* selected line/range
+* selected line(s)
 * issue category
 * diagnosis / what is wrong
 * optional impact
@@ -167,4 +167,3 @@ The MVP is successful if a learner can:
 * payments/subscriptions
 
 These are designed as later phases, not blockers for the MVP.
-

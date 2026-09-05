@@ -6,7 +6,7 @@ function finding(overrides: Partial<LearnerFinding> = {}): LearnerFinding {
   return {
     id: 'learner-finding-1',
     fileId: 'task-list',
-    location: { startLine: 15, endLine: 17 },
+    locations: [{ startLine: 15 }, { startLine: 17 }],
     category: 'logic',
     diagnosis:
       'visibleTasks becomes stale because useState keeps the initial value when props change',
@@ -57,7 +57,7 @@ describe('evaluateReview', () => {
     const result = evaluateReview(reactDerivedStateExercise, [
       finding({
         fileId: 'another-file',
-        location: { startLine: 2 },
+        locations: [{ startLine: 2 }],
         category: 'testing',
         diagnosis: 'Add another test.',
       }),

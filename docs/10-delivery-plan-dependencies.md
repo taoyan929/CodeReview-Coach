@@ -33,7 +33,7 @@ Build the product in vertical slices, but keep the domain/data contracts stable 
 ### Outcomes
 
 * challenge brief
-* selectable code lines/ranges
+* independently selectable code lines
 * structured beginner review
 * intermediate/advanced scaffolding modes
 * deterministic evaluation
@@ -49,7 +49,7 @@ Build the product in vertical slices, but keep the domain/data contracts stable 
 ### Recommended build order
 
 1. Build one “golden” exercise end-to-end.
-2. Add line/range finding interaction.
+2. Add independent multi-line finding interaction.
 3. Implement deterministic finding evaluation.
 4. Implement staged feedback.
 5. Add fix step.
@@ -191,4 +191,3 @@ Relevant docs:
 ## Change-management rule
 
 When a product decision changes scoring, exercise schema, completion/mastery semantics or AI responsibility, update the relevant Linear doc before/with the implementation issue so code and product behaviour do not drift.
-

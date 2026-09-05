@@ -109,7 +109,7 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 - Application scaffold: complete
 - Exercise and learner-state contracts: initial version implemented
 - Golden exercise: React derived-state review available
-- Structured review workspace: line/range selection, guided findings, progressive hints, multiple comments, submission, retry, and local attempt persistence implemented
+- Structured review workspace: independent line selection, guided findings, progressive hints, multiple comments, submission, retry, and local attempt persistence implemented
 - Deterministic scoring: finding-level technical dimensions, separate communication score, assistance tracking, staged feedback, and final reveal implemented
 - Current recommended work: implement TAO-22 fix-the-code practice and completion transition
 

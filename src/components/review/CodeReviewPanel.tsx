@@ -1,13 +1,14 @@
 import { Fragment, useMemo } from 'react'
 
-import type { CodeFile, CodeLocation } from '../../domain/exercise/types'
+import type { CodeFile } from '../../domain/exercise/types'
 import type { LearnerFinding } from '../../domain/learning/types'
+import { getSelectedLineNumbers } from '../../utils/formatCodeLocations'
 
 interface CodeReviewPanelProps {
   file: CodeFile
   findings: LearnerFinding[]
-  selection?: CodeLocation
-  onSelect: (selection?: CodeLocation) => void
+  selectedLines: number[]
+  onSelect: (lines: number[]) => void
 }
 
 const tokenPattern =
@@ -39,49 +40,36 @@ function highlightLine(line: string) {
   })
 }
 
-function includesLine(location: CodeLocation, lineNumber: number) {
-  return (
-    lineNumber >= location.startLine &&
-    lineNumber <= (location.endLine ?? location.startLine)
-  )
-}
-
 export function CodeReviewPanel({
   file,
   findings,
-  selection,
+  selectedLines,
   onSelect,
 }: CodeReviewPanelProps) {
   const commentCounts = useMemo(() => {
     const counts = new Map<number, number>()
 
     for (const finding of findings.filter(({ fileId }) => fileId === file.id)) {
-      counts.set(
-        finding.location.startLine,
-        (counts.get(finding.location.startLine) ?? 0) + 1,
-      )
+      for (const line of getSelectedLineNumbers(finding.locations)) {
+        counts.set(line, (counts.get(line) ?? 0) + 1)
+      }
     }
 
     return counts
   }, [file.id, findings])
 
   function selectLine(lineNumber: number) {
-    if (!selection) {
-      onSelect({ startLine: lineNumber, endLine: lineNumber })
+    if (selectedLines.includes(lineNumber)) {
       return
     }
 
-    const currentEnd = selection.endLine ?? selection.startLine
+    onSelect([...selectedLines, lineNumber].sort((left, right) => left - right))
+  }
 
-    if (selection.startLine === lineNumber && currentEnd === lineNumber) {
-      onSelect({ startLine: lineNumber, endLine: lineNumber })
-      return
-    }
-
-    onSelect({
-      startLine: Math.min(selection.startLine, lineNumber),
-      endLine: Math.max(currentEnd, lineNumber),
-    })
+  function deselectLine(lineNumber: number) {
+    onSelect(
+      selectedLines.filter((selectedLine) => selectedLine !== lineNumber),
+    )
   }
 
   return (
@@ -98,9 +86,7 @@ export function CodeReviewPanel({
       <div className="overflow-x-auto py-3 font-mono text-[13px] leading-6 text-[#d9dfeb]">
         {file.content.split('\n').map((line, index) => {
           const lineNumber = index + 1
-          const isSelected = selection
-            ? includesLine(selection, lineNumber)
-            : false
+          const isSelected = selectedLines.includes(lineNumber)
           const commentCount = commentCounts.get(lineNumber) ?? 0
 
           return (
@@ -112,8 +98,8 @@ export function CodeReviewPanel({
               }`}
               key={`${lineNumber}-${line}`}
               onClick={() => selectLine(lineNumber)}
-              onDoubleClick={() => onSelect(undefined)}
-              title="Double-click to clear the selection"
+              onDoubleClick={() => deselectLine(lineNumber)}
+              title="Double-click to deselect this line"
               type="button"
             >
               <span

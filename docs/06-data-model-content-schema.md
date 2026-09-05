@@ -149,7 +149,7 @@ Level guidance:
 interface LearnerFinding {
   id: string;
   fileId: string;
-  location: CodeLocation;
+  locations: CodeLocation[];
   category?: IssueCategory;
   diagnosis: string;
   impact?: string;
@@ -157,6 +157,8 @@ interface LearnerFinding {
   createdAt: string;
 }
 ```
+
+`locations` stores one or more independently selected lines/ranges. This allows a single review finding to reference non-adjacent lines without treating every intervening line as selected. Learner-state schema version 3 migrates the former singular `location` field into a one-item `locations` array.
 
 Advanced mode may omit category and use a free-form comment while mapping into the same model.
 
@@ -300,4 +302,3 @@ AI output is additive to deterministic evaluation rather than replacing the base
 ## 17. Validation
 
 All exercise/curriculum content should be schema-validated at build/startup time. Invalid content must fail clearly during development rather than silently producing broken learning experiences.
-

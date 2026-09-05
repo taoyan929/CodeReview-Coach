@@ -18,3 +18,4 @@ The project follows the principles of [Keep a Changelog](https://keepachangelog.
 - Progressive hints, multi-finding review submission, retry flow, first-feedback state, and persisted exercise attempts.
 - Deterministic finding-level scoring for detection, category, diagnosis, reasoning, and suggested fixes.
 - Separate communication scoring, hint-assistance tracking, staged first feedback, and learner-controlled final reveal.
+- Independent non-adjacent code-line selection, per-line double-click removal, and learner-state v2→v3 finding-location migration.

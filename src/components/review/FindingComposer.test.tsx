@@ -5,17 +5,14 @@ import { FindingComposer } from './FindingComposer'
 describe('FindingComposer', () => {
   it('requires a selection and diagnosis before adding a structured finding', () => {
     const onAdd = vi.fn()
-    const { rerender } = render(<FindingComposer onAdd={onAdd} />)
+    const { rerender } = render(
+      <FindingComposer onAdd={onAdd} selectedLines={[]} />,
+    )
     const addButton = screen.getByRole('button', { name: 'Add finding' })
 
     expect(addButton).toBeDisabled()
 
-    rerender(
-      <FindingComposer
-        onAdd={onAdd}
-        selection={{ startLine: 15, endLine: 17 }}
-      />,
-    )
+    rerender(<FindingComposer onAdd={onAdd} selectedLines={[15, 17]} />)
     fireEvent.change(screen.getByLabelText(/What did you notice/), {
       target: { value: 'The derived list becomes stale.' },
     })

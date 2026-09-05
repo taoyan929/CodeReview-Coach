@@ -35,7 +35,7 @@ Dashboard
 
  1. Read requirement.
  2. Inspect code.
- 3. Select suspicious line/range.
+ 3. Select one or more suspicious lines independently.
  4. Choose issue category.
  5. Enter diagnosis in own words.
  6. Optionally explain impact.
@@ -49,7 +49,7 @@ The learner is not required to write a standard sentence.
 ## 4. Intermediate review workflow
 
 1. Read requirement.
-2. Select code line/range.
+2. Select one or more code lines independently.
 3. Write free-form inline review comment.
 4. Request Category Hint / Concept Hint / Strong Hint only if needed.
 5. Add multiple comments.
@@ -202,4 +202,3 @@ Connect/import PR
 → update mastery/history
 
 The same core ReviewFinding contract should be used for curated and real PR modes.
-

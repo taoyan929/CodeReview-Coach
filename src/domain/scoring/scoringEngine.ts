@@ -102,8 +102,10 @@ function detectionScore(
     return 0
   }
 
-  return expectedFinding.acceptedLocations.some((location) =>
-    locationsOverlap(learnerFinding.location, location),
+  return learnerFinding.locations.some((selectedLocation) =>
+    expectedFinding.acceptedLocations.some((acceptedLocation) =>
+      locationsOverlap(selectedLocation, acceptedLocation),
+    ),
   )
     ? 1
     : 0
