@@ -252,8 +252,9 @@ export function ChallengePage() {
             selection={selection}
           />
           <p className="mt-3 text-xs leading-5 text-paper/35">
-            Select one line, then another to extend the review range. Added
-            comments appear as markers beside their starting line.
+            Select one line, then another to extend the review range.
+            Double-click any code line to clear the selection. Added comments
+            appear as markers beside their starting line.
           </p>
         </main>
 

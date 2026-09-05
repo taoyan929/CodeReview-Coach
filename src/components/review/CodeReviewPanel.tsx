@@ -7,7 +7,7 @@ interface CodeReviewPanelProps {
   file: CodeFile
   findings: LearnerFinding[]
   selection?: CodeLocation
-  onSelect: (selection: CodeLocation) => void
+  onSelect: (selection?: CodeLocation) => void
 }
 
 const tokenPattern =
@@ -112,6 +112,8 @@ export function CodeReviewPanel({
               }`}
               key={`${lineNumber}-${line}`}
               onClick={() => selectLine(lineNumber)}
+              onDoubleClick={() => onSelect(undefined)}
+              title="Double-click to clear the selection"
               type="button"
             >
               <span
