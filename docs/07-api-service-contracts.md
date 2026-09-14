@@ -1,4 +1,4 @@
-> Status: Draft · Last reviewed: 2026-09-04 · Imported from [Linear](https://linear.app/taoyan929/document/07-api-and-service-contracts-9f9304c2ec86).
+> Status: MVP local contracts aligned · Last reviewed: 2026-09-14 · Imported from [Linear](https://linear.app/taoyan929/document/07-api-and-service-contracts-9f9304c2ec86).
 >
 > Repository Markdown is the implementation reference. Material product changes should be reflected in both this document and the matching Linear issue or project document.
 
@@ -370,4 +370,3 @@ Use appropriate HTTP status codes and avoid exposing internal exception details.
 ## 16. Implementation recommendation
 
 Do not build these HTTP endpoints for the MVP merely because they are documented. First implement the matching local service interfaces. Introduce the backend only when an actual feature—accounts, cloud sync, AI or GitHub integration—requires it.
-

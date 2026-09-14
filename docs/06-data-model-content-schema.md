@@ -1,4 +1,4 @@
-> Status: Draft · Last reviewed: 2026-09-04 · Imported from [Linear](https://linear.app/taoyan929/document/06-data-model-and-content-schema-e179730229f1).
+> Status: MVP aligned · Last reviewed: 2026-09-14 · Imported from [Linear](https://linear.app/taoyan929/document/06-data-model-and-content-schema-e179730229f1).
 >
 > Repository Markdown is the implementation reference. Material product changes should be reflected in both this document and the matching Linear issue or project document.
 

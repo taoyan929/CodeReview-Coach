@@ -51,4 +51,13 @@ describe('CodeReviewPanel', () => {
     fireEvent.doubleClick(secondLine)
     expect(selection).toHaveTextContent('1,3')
   })
+
+  it('lets keyboard users remove a selected line', () => {
+    render(<SelectionHarness />)
+    const firstLine = screen.getByRole('button', { name: /Select line 1:/ })
+    const selection = screen.getByRole('status', { name: 'Current selection' })
+    fireEvent.click(firstLine)
+    fireEvent.keyDown(firstLine, { key: 'Delete' })
+    expect(selection).toHaveTextContent('none')
+  })
 })

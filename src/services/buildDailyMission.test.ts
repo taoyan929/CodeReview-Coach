@@ -14,6 +14,7 @@ describe('buildDailyMission', () => {
         },
       ],
       new Date('2026-09-04T12:00:00.000Z'),
+      'UTC',
     )
 
     expect(mission).toEqual({
@@ -37,6 +38,7 @@ describe('buildDailyMission', () => {
       [reactDerivedStateExercise],
       [],
       new Date('2026-09-04T12:00:00.000Z'),
+      'UTC',
     )
 
     expect(mission.exerciseIds).toEqual([])

@@ -157,6 +157,9 @@ export interface ExerciseRepository {
 export interface LearnerStateRepository {
   load(): Promise<LearnerState>
   save(state: LearnerState): Promise<void>
+  exportBackup(): Promise<string>
+  exportRawData(): Promise<string | null>
+  restoreBackup(serializedBackup: string): Promise<LearnerState>
   reset(): Promise<void>
 }
 

@@ -1,4 +1,4 @@
-> Status: Implemented for review scoring, deterministic progress, and adaptive recommendations · Last reviewed: 2026-09-05 · Imported from [Linear](https://linear.app/taoyan929/document/03-learning-scoring-and-adaptive-model-716ed7acf5b5).
+> Status: MVP implemented · Last reviewed: 2026-09-14 · Imported from [Linear](https://linear.app/taoyan929/document/03-learning-scoring-and-adaptive-model-716ed7acf5b5).
 >
 > Repository Markdown is the implementation reference. Material product changes should be reflected in both this document and the matching Linear issue or project document.
 
@@ -189,7 +189,7 @@ Weak status should decay/remove after successful later practice.
 
 The implemented deterministic weak threshold is mastery below 70 for a concept that has been missed at least once. Priority increases as mastery falls and miss count rises. Tracks with measured mastery below 70 are surfaced separately. These rules are domain constants and can be calibrated without changing page components.
 
-Streaks use unique UTC completion dates. The current streak remains active when the last completion was today or yesterday. Weekly goals start on Monday, default to five completed fixes, and preserve a learner's target for the active week.
+Streaks use unique completion dates in the browser's local calendar. The current streak remains active when the last local completion date was today or yesterday. Weekly goals start on local Monday, default to five completed fixes, and preserve a learner's target for the active week. These values are re-derived from attempt history, so the calendar correction requires no learner-state schema migration.
 
 ## 10. Rule-based recommendations
 

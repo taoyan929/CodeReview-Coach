@@ -1,4 +1,4 @@
-> Status: Draft · Last reviewed: 2026-09-04 · Imported from [Linear](https://linear.app/taoyan929/document/10-delivery-plan-and-dependency-map-192411f89558).
+> Status: M1–M3 delivered · Last reviewed: 2026-09-14 · Imported from [Linear](https://linear.app/taoyan929/document/10-delivery-plan-and-dependency-map-192411f89558).
 >
 > Repository Markdown is the implementation reference. Material product changes should be reflected in both this document and the matching Linear issue or project document.
 
@@ -72,8 +72,9 @@ Build the product in vertical slices, but keep the domain/data contracts stable 
 
 * [TAO-23](https://linear.app/taoyan929/issue/TAO-23/build-curriculum-progress-mastery-and-weak-topic-tracking) Progress/mastery/weak topics ✅
 * [TAO-25](https://linear.app/taoyan929/issue/TAO-25/implement-rule-based-adaptive-learning-path-and-daily-recommendations) Rule-based adaptive path ✅
-* [TAO-26](https://linear.app/taoyan929/issue/TAO-26/add-developer-style-missions-streaks-and-boss-reviews) Missions/streaks/Boss Reviews
-* [TAO-24](https://linear.app/taoyan929/issue/TAO-24/polish-test-and-prepare-mvp-release) MVP quality/release
+* [TAO-26](https://linear.app/taoyan929/issue/TAO-26/add-developer-style-missions-streaks-and-boss-reviews) Missions/streaks/Boss Reviews ✅
+* [TAO-30](https://linear.app/taoyan929/issue/TAO-30/build-dashboard-todays-mission-and-learning-path-ui) Dashboard/mission/path UI ✅
+* [TAO-24](https://linear.app/taoyan929/issue/TAO-24/polish-test-and-prepare-mvp-release) MVP quality/release ✅
 
 ### Recommended build order
 
@@ -157,9 +158,9 @@ AI Adaptive / Real PR (TAO-28/29)
 
 Exercise content ([TAO-19](https://linear.app/taoyan929/issue/TAO-19/create-first-full-stack-review-exercise-pack)) can proceed in parallel after the schema stabilises, but the first few exercises should be used as golden test cases rather than creating all content before the learning loop works.
 
-## Recommended first development slice
+## Delivered first development slice
 
-Implement exactly one beginner FastAPI or React challenge through the full flow:
+The original golden-slice strategy was completed and then extended across the validated curriculum:
 
 Dashboard placeholder
 → Challenge Brief

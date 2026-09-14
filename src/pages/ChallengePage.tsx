@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useReducer } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 
 import { CodeReviewPanel } from '../components/review/CodeReviewPanel'
@@ -24,20 +24,117 @@ interface ChallengeLoaderData {
   exercise: Exercise
   exercises: Exercise[]
   curriculum: Curriculum
+  existingAttempt?: ExerciseAttempt
+}
+
+type SessionPhase = 'reviewing' | 'feedback' | 'fixing' | 'complete'
+
+interface ReviewSessionState {
+  phase: SessionPhase
+  activeFileId: string
+  selectedLines: number[]
+  findings: LearnerFinding[]
+  hintsUsed: HintUsage[]
+  startedAt: string
+  submittedAttempt?: ExerciseAttempt
+  submitError?: string
+  isSubmitting: boolean
+}
+
+type ReviewSessionAction =
+  | { type: 'select-file'; fileId: string }
+  | { type: 'select-lines'; lines: number[] }
+  | { type: 'add-finding'; finding: LearnerFinding }
+  | { type: 'remove-finding'; findingId: string }
+  | { type: 'use-hint'; hint: HintUsage }
+  | { type: 'submit-started' }
+  | { type: 'submit-succeeded'; attempt: ExerciseAttempt }
+  | { type: 'submit-failed'; message: string }
+  | {
+      type: 'retry'
+      fileId: string
+      hintsUsed: HintUsage[]
+      startedAt: string
+    }
+  | { type: 'start-fix' }
+  | { type: 'fix-completed'; attempt: ExerciseAttempt }
+
+function reviewSessionReducer(
+  state: ReviewSessionState,
+  action: ReviewSessionAction,
+): ReviewSessionState {
+  switch (action.type) {
+    case 'select-file':
+      return { ...state, activeFileId: action.fileId, selectedLines: [] }
+    case 'select-lines':
+      return { ...state, selectedLines: action.lines }
+    case 'add-finding':
+      return {
+        ...state,
+        findings: [...state.findings, action.finding],
+        selectedLines: [],
+        submitError: undefined,
+      }
+    case 'remove-finding':
+      return {
+        ...state,
+        findings: state.findings.filter(({ id }) => id !== action.findingId),
+      }
+    case 'use-hint':
+      return { ...state, hintsUsed: [...state.hintsUsed, action.hint] }
+    case 'submit-started':
+      return { ...state, submitError: undefined, isSubmitting: true }
+    case 'submit-succeeded':
+      return {
+        ...state,
+        phase: 'feedback',
+        submittedAttempt: action.attempt,
+        isSubmitting: false,
+      }
+    case 'submit-failed':
+      return { ...state, submitError: action.message, isSubmitting: false }
+    case 'retry':
+      return {
+        phase: 'reviewing',
+        activeFileId: action.fileId,
+        selectedLines: [],
+        findings: [],
+        hintsUsed: action.hintsUsed,
+        startedAt: action.startedAt,
+        submittedAttempt: undefined,
+        submitError: undefined,
+        isSubmitting: false,
+      }
+    case 'start-fix':
+      return { ...state, phase: 'fixing' }
+    case 'fix-completed':
+      return { ...state, phase: 'complete', submittedAttempt: action.attempt }
+  }
 }
 
 export function ChallengePage() {
-  const { exercise, exercises, curriculum } =
+  const { exercise, exercises, curriculum, existingAttempt } =
     useLoaderData() as ChallengeLoaderData
-  const [activeFileId, setActiveFileId] = useState(exercise.files[0]?.id ?? '')
-  const [selectedLines, setSelectedLines] = useState<number[]>([])
-  const [findings, setFindings] = useState<LearnerFinding[]>([])
-  const [hintsUsed, setHintsUsed] = useState<HintUsage[]>([])
-  const [startedAt, setStartedAt] = useState(() => new Date().toISOString())
-  const [submittedAttempt, setSubmittedAttempt] = useState<ExerciseAttempt>()
-  const [isFixing, setIsFixing] = useState(false)
-  const [submitError, setSubmitError] = useState<string>()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [session, dispatch] = useReducer(reviewSessionReducer, {
+    phase: existingAttempt ? 'feedback' : 'reviewing',
+    activeFileId: exercise.files[0]?.id ?? '',
+    selectedLines: [],
+    findings: existingAttempt?.findings ?? [],
+    hintsUsed: existingAttempt?.hintsUsed ?? [],
+    startedAt: existingAttempt?.startedAt ?? new Date().toISOString(),
+    submittedAttempt: existingAttempt,
+    isSubmitting: false,
+  })
+  const {
+    activeFileId,
+    selectedLines,
+    findings,
+    hintsUsed,
+    startedAt,
+    submittedAttempt,
+    submitError,
+    isSubmitting,
+  } = session
 
   const activeFile = exercise.files.find(({ id }) => id === activeFileId)
   const progressiveHints = useMemo(() => {
@@ -56,18 +153,16 @@ export function ChallengePage() {
       return
     }
 
-    setFindings((current) => [
-      ...current,
-      {
+    dispatch({
+      type: 'add-finding',
+      finding: {
         id: crypto.randomUUID(),
         fileId: activeFileId,
         locations: selectedLines.map((startLine) => ({ startLine })),
         ...draft,
         createdAt: new Date().toISOString(),
       },
-    ])
-    setSelectedLines([])
-    setSubmitError(undefined)
+    })
   }
 
   function requestHint() {
@@ -75,19 +170,18 @@ export function ChallengePage() {
       return
     }
 
-    setHintsUsed((current) => [
-      ...current,
-      {
+    dispatch({
+      type: 'use-hint',
+      hint: {
         expectedFindingId: exercise.expectedFindings[0]?.id,
         level: nextHint.level,
         usedAt: new Date().toISOString(),
       },
-    ])
+    })
   }
 
   async function finishReview() {
-    setSubmitError(undefined)
-    setIsSubmitting(true)
+    dispatch({ type: 'submit-started' })
 
     try {
       const attempt = await submitReviewAttempt(
@@ -99,25 +193,23 @@ export function ChallengePage() {
         },
         learnerStateRepository,
       )
-      setSubmittedAttempt(attempt)
+      dispatch({ type: 'submit-succeeded', attempt })
     } catch (error) {
-      setSubmitError(
-        error instanceof Error ? error.message : 'Unable to submit review.',
-      )
-    } finally {
-      setIsSubmitting(false)
+      dispatch({
+        type: 'submit-failed',
+        message:
+          error instanceof Error ? error.message : 'Unable to submit review.',
+      })
     }
   }
 
   function retryExercise(nextHints: HintUsage[]) {
-    setActiveFileId(exercise.files[0]?.id ?? '')
-    setSelectedLines([])
-    setFindings([])
-    setHintsUsed(nextHints)
-    setStartedAt(new Date().toISOString())
-    setSubmittedAttempt(undefined)
-    setIsFixing(false)
-    setSubmitError(undefined)
+    dispatch({
+      type: 'retry',
+      fileId: exercise.files[0]?.id ?? '',
+      hintsUsed: nextHints,
+      startedAt: new Date().toISOString(),
+    })
   }
 
   function retryWithoutHint() {
@@ -139,7 +231,10 @@ export function ChallengePage() {
     ])
   }
 
-  if (submittedAttempt && isFixing) {
+  if (
+    submittedAttempt &&
+    (session.phase === 'fixing' || session.phase === 'complete')
+  ) {
     return (
       <FixCodeStep
         attempt={submittedAttempt}
@@ -155,7 +250,7 @@ export function ChallengePage() {
             },
             learnerStateRepository,
           )
-          setSubmittedAttempt(completedAttempt)
+          dispatch({ type: 'fix-completed', attempt: completedAttempt })
           return completedAttempt
         }}
       />
@@ -170,7 +265,7 @@ export function ChallengePage() {
         exercise={exercise}
         onRetry={retryWithoutHint}
         onRetryWithHint={retryWithHint}
-        onStartFix={() => setIsFixing(true)}
+        onStartFix={() => dispatch({ type: 'start-fix' })}
       />
     )
   }
@@ -261,6 +356,9 @@ export function ChallengePage() {
               </p>
             )}
             <button
+              aria-describedby={
+                !nextHint ? 'hint-unavailable-reason' : undefined
+              }
               className="mt-5 w-full rounded-full border border-amber-200/20 px-4 py-2.5 text-sm font-medium text-amber-100/80 transition enabled:hover:border-amber-200/40 enabled:hover:bg-amber-200/[0.06] disabled:cursor-not-allowed disabled:opacity-35"
               disabled={!nextHint}
               onClick={requestHint}
@@ -268,10 +366,15 @@ export function ChallengePage() {
             >
               {nextHint ? `Get hint ${hintsUsed.length + 1}` : 'All hints used'}
             </button>
+            {!nextHint && (
+              <p className="sr-only" id="hint-unavailable-reason">
+                No more hints are available for this exercise.
+              </p>
+            )}
           </section>
         </aside>
 
-        <main className="min-w-0">
+        <section aria-label="Code review workspace" className="min-w-0">
           <div
             aria-label="Exercise files"
             className="mb-3 flex gap-2 overflow-x-auto"
@@ -279,6 +382,7 @@ export function ChallengePage() {
           >
             {exercise.files.map((file) => (
               <button
+                aria-controls={`exercise-panel-${file.id}`}
                 aria-selected={file.id === activeFile.id}
                 className={`shrink-0 rounded-full px-4 py-2 font-mono text-xs transition ${
                   file.id === activeFile.id
@@ -286,9 +390,9 @@ export function ChallengePage() {
                     : 'border border-white/10 text-paper/50 hover:text-paper'
                 }`}
                 key={file.id}
+                id={`exercise-tab-${file.id}`}
                 onClick={() => {
-                  setActiveFileId(file.id)
-                  setSelectedLines([])
+                  dispatch({ type: 'select-file', fileId: file.id })
                 }}
                 role="tab"
                 type="button"
@@ -300,7 +404,9 @@ export function ChallengePage() {
           <CodeReviewPanel
             file={activeFile}
             findings={findings}
-            onSelect={setSelectedLines}
+            id={`exercise-panel-${activeFile.id}`}
+            labelledBy={`exercise-tab-${activeFile.id}`}
+            onSelect={(lines) => dispatch({ type: 'select-lines', lines })}
             selectedLines={selectedLines}
           />
           <p className="mt-3 text-xs leading-5 text-paper/35">
@@ -308,7 +414,7 @@ export function ChallengePage() {
             Double-click a selected line to remove only that line. Added
             comments appear as markers beside every selected line.
           </p>
-        </main>
+        </section>
 
         <aside className="min-w-0 space-y-6">
           <FindingComposer onAdd={addFinding} selectedLines={selectedLines} />
@@ -325,10 +431,8 @@ export function ChallengePage() {
             <div className="mt-4">
               <FindingList
                 findings={findings}
-                onRemove={(id) =>
-                  setFindings((current) =>
-                    current.filter((finding) => finding.id !== id),
-                  )
+                onRemove={(findingId) =>
+                  dispatch({ type: 'remove-finding', findingId })
                 }
               />
             </div>
@@ -339,6 +443,9 @@ export function ChallengePage() {
               </p>
             )}
             <button
+              aria-describedby={
+                findings.length === 0 ? 'finish-review-reason' : undefined
+              }
               className="mt-5 w-full rounded-full bg-mint px-5 py-3.5 font-semibold text-ink transition enabled:hover:bg-[#92f0c3] disabled:cursor-not-allowed disabled:opacity-35"
               disabled={findings.length === 0 || isSubmitting}
               onClick={finishReview}
@@ -348,6 +455,11 @@ export function ChallengePage() {
                 ? 'Submitting…'
                 : `Finish review · ${findings.length}`}
             </button>
+            {findings.length === 0 && (
+              <p className="sr-only" id="finish-review-reason">
+                Finish review is unavailable. Add at least one finding first.
+              </p>
+            )}
           </section>
         </aside>
       </div>

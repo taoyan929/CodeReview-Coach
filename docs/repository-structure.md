@@ -1,6 +1,6 @@
 # Repository structure
 
-> Status: Active · Last reviewed: 2026-09-05
+> Status: Active · Last reviewed: 2026-09-14
 
 The repository started documentation-first and now follows the application boundaries below.
 
@@ -16,6 +16,7 @@ The repository started documentation-first and now follows the application bound
 │   ├── app/                    Router, providers, and app composition
 │   ├── pages/                  Route-level product surfaces
 │   ├── components/             Reusable presentation and interaction components
+│   ├── config/                 Read-only learning and unlock thresholds
 │   ├── domain/                 Framework-independent domain types and rules
 │   ├── services/               Application-facing engine implementations
 │   ├── repositories/           Storage and content boundaries
@@ -23,7 +24,8 @@ The repository started documentation-first and now follows the application bound
 │   ├── schemas/                Runtime validation and migrations
 │   ├── types/                  Shared TypeScript types when no domain owns them
 │   └── utils/                  Small domain-neutral helpers
-├── tests/                      Cross-feature and end-to-end tests
+├── e2e/                        Playwright browser and accessibility journeys
+├── playwright.config.ts        Dedicated-port Chromium test configuration
 ├── CONTRIBUTING.md
 ├── ROADMAP.md
 └── README.md
@@ -41,7 +43,7 @@ The repository started documentation-first and now follows the application bound
 ## Test placement
 
 - Co-locate focused unit/component tests with source files when that improves discoverability.
-- Keep cross-domain integration tests and browser journeys under `tests/`.
+- Keep focused integration tests near their service and browser journeys under `e2e/`.
 - Keep reusable golden scoring cases under a dedicated test fixture directory once TAO-21 starts.
 
 ## Naming conventions

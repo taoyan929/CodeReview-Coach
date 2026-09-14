@@ -5,6 +5,7 @@ import {
   type IssueCategory,
 } from '../../domain/exercise/types'
 import { formatLabel } from '../../utils/formatLabel'
+import { learningRules } from '../../config/learningRules'
 
 export interface FindingDraft {
   category: IssueCategory
@@ -27,18 +28,21 @@ export function FindingComposer({
   const [impact, setImpact] = useState('')
   const [suggestedFix, setSuggestedFix] = useState('')
   const [showDisabledReason, setShowDisabledReason] = useState(false)
-  const isAddUnavailable = selectedLines.length === 0 || !diagnosis.trim()
+  const diagnosisLength = diagnosis.replace(/[^\p{L}\p{N}]/gu, '').length
+  const hasMeaningfulDiagnosis =
+    diagnosisLength >= learningRules.diagnosis.minimumMeaningfulCharacters
+  const isAddUnavailable = selectedLines.length === 0 || !hasMeaningfulDiagnosis
   const disabledReason =
-    selectedLines.length === 0 && !diagnosis.trim()
-      ? 'Select at least one code line and describe what you noticed.'
+    selectedLines.length === 0 && !hasMeaningfulDiagnosis
+      ? 'Select at least one code line and enter at least 3 meaningful characters.'
       : selectedLines.length === 0
         ? 'Select at least one code line first.'
-        : 'Describe what you noticed before adding the finding.'
+        : 'Enter at least 3 meaningful characters describing what you noticed.'
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (selectedLines.length === 0 || !diagnosis.trim()) {
+    if (selectedLines.length === 0 || !hasMeaningfulDiagnosis) {
       return
     }
 
@@ -129,8 +133,10 @@ export function FindingComposer({
         aria-describedby={
           isAddUnavailable ? 'add-finding-disabled-reason' : undefined
         }
-        className={`mt-6 w-full rounded-full bg-paper px-5 py-3 text-sm font-semibold text-ink transition ${
-          isAddUnavailable ? 'cursor-help opacity-35' : 'hover:bg-white'
+        className={`mt-6 w-full rounded-full px-5 py-3 text-sm font-semibold transition ${
+          isAddUnavailable
+            ? 'cursor-help border border-white/15 bg-white/10 text-paper/75'
+            : 'bg-paper text-ink hover:bg-white'
         }`}
         onBlur={() => setShowDisabledReason(false)}
         onClick={() => {

@@ -11,6 +11,7 @@ import {
   type LearningProgressSnapshot,
 } from './deriveLearningProgress'
 import { recommendExercises } from './recommendExercises'
+import { calendarDateKey } from '../utils/calendar'
 
 export interface DashboardData {
   exercises: Exercise[]
@@ -22,24 +23,27 @@ export async function getDashboardData(
   exerciseRepository: ExerciseRepository,
   learnerStateRepository: LearnerStateRepository,
   now = new Date(),
+  timeZone?: string,
 ): Promise<DashboardData> {
   const [exercises, curriculum, learnerState] = await Promise.all([
     exerciseRepository.listExercises(),
     exerciseRepository.getCurriculum(),
     learnerStateRepository.load(),
   ])
-  const dateKey = now.toISOString().slice(0, 10)
+  const dateKey = calendarDateKey(now, timeZone)
   const synchronisedState = synchroniseLearnerProgress(
     learnerState,
     exercises,
     curriculum,
     now,
+    timeZone,
   )
   const progress = deriveLearningProgress(
     synchronisedState,
     exercises,
     curriculum,
     now,
+    timeZone,
   )
   const hasCurrentRecommendations =
     synchronisedState.dailyMission?.date === dateKey &&
@@ -60,6 +64,7 @@ export async function getDashboardData(
             now,
           }),
           now,
+          timeZone,
         ),
       }
   const updatedState = synchroniseLearnerProgress(
@@ -67,6 +72,7 @@ export async function getDashboardData(
     exercises,
     curriculum,
     now,
+    timeZone,
   )
 
   await learnerStateRepository.save(updatedState)
@@ -74,6 +80,12 @@ export async function getDashboardData(
   return {
     exercises,
     learnerState: updatedState,
-    progress: deriveLearningProgress(updatedState, exercises, curriculum, now),
+    progress: deriveLearningProgress(
+      updatedState,
+      exercises,
+      curriculum,
+      now,
+      timeZone,
+    ),
   }
 }

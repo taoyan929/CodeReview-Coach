@@ -73,9 +73,14 @@ export function FixCodeStep({ exercise, attempt, onSubmit }: FixCodeStepProps) {
       </p>
 
       <section className="mt-10 overflow-hidden rounded-3xl border border-white/10 bg-[#0d0f13]">
-        <div className="flex gap-2 overflow-x-auto border-b border-white/10 p-3">
+        <div
+          aria-label="Files to fix"
+          className="flex gap-2 overflow-x-auto border-b border-white/10 p-3"
+          role="tablist"
+        >
           {exercise.files.map((file) => (
             <button
+              aria-controls={`fix-panel-${file.id}`}
               aria-selected={file.id === activeFile.id}
               className={`shrink-0 rounded-full px-4 py-2 font-mono text-xs transition ${
                 file.id === activeFile.id
@@ -83,6 +88,7 @@ export function FixCodeStep({ exercise, attempt, onSubmit }: FixCodeStepProps) {
                   : 'border border-white/10 text-paper/50 hover:text-paper'
               }`}
               key={file.id}
+              id={`fix-tab-${file.id}`}
               onClick={() => setActiveFileId(file.id)}
               role="tab"
               type="button"
@@ -91,22 +97,28 @@ export function FixCodeStep({ exercise, attempt, onSubmit }: FixCodeStepProps) {
             </button>
           ))}
         </div>
-        <label className="sr-only" htmlFor={`fix-${activeFile.id}`}>
-          Edit {activeFile.path}
-        </label>
-        <textarea
-          aria-label={`Edit ${activeFile.path}`}
-          className="min-h-[520px] w-full resize-y bg-transparent p-5 font-mono text-[13px] leading-6 text-[#d9dfeb] outline-none focus:bg-white/[0.02] sm:p-7"
-          id={`fix-${activeFile.id}`}
-          onChange={(event) =>
-            setDrafts((current) => ({
-              ...current,
-              [activeFile.id]: event.target.value,
-            }))
-          }
-          spellCheck={false}
-          value={drafts[activeFile.id] ?? activeFile.content}
-        />
+        <div
+          aria-labelledby={`fix-tab-${activeFile.id}`}
+          id={`fix-panel-${activeFile.id}`}
+          role="tabpanel"
+        >
+          <label className="sr-only" htmlFor={`fix-${activeFile.id}`}>
+            Edit {activeFile.path}
+          </label>
+          <textarea
+            aria-label={`Edit ${activeFile.path}`}
+            className="min-h-[520px] w-full resize-y bg-transparent p-5 font-mono text-[13px] leading-6 text-[#d9dfeb] outline-none focus:bg-white/[0.02] sm:p-7"
+            id={`fix-${activeFile.id}`}
+            onChange={(event) =>
+              setDrafts((current) => ({
+                ...current,
+                [activeFile.id]: event.target.value,
+              }))
+            }
+            spellCheck={false}
+            value={drafts[activeFile.id] ?? activeFile.content}
+          />
+        </div>
       </section>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
@@ -116,6 +128,7 @@ export function FixCodeStep({ exercise, attempt, onSubmit }: FixCodeStepProps) {
             : 'Make at least one change before submitting.'}
         </p>
         <button
+          aria-describedby={!hasChanges ? 'submit-fix-reason' : undefined}
           className="rounded-full bg-mint px-6 py-3 font-semibold text-ink transition enabled:hover:bg-[#92f0c3] disabled:cursor-not-allowed disabled:opacity-35"
           disabled={!hasChanges || isSubmitting}
           onClick={submitFix}
@@ -124,6 +137,11 @@ export function FixCodeStep({ exercise, attempt, onSubmit }: FixCodeStepProps) {
           {isSubmitting ? 'Submitting fix…' : 'Submit fix'}
         </button>
       </div>
+      {!hasChanges && (
+        <p className="sr-only" id="submit-fix-reason">
+          Submit fix is unavailable. Make at least one code change first.
+        </p>
+      )}
       {submitError && (
         <p className="mt-4 text-sm text-red-300" role="alert">
           {submitError}

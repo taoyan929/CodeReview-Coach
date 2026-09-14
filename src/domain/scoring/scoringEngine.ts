@@ -5,6 +5,7 @@ import type {
   HintUsage,
   LearnerFinding,
 } from '../learning/types'
+import { learningRules } from '../../config/learningRules'
 
 export const TECHNICAL_DIMENSION_WEIGHTS = {
   detection: 0.35,
@@ -60,6 +61,14 @@ function tokenise(value: string) {
       .replace(/[^a-z0-9]+/g, ' ')
       .split(/\s+/)
       .filter((token) => token.length > 1 && !stopWords.has(token)),
+  )
+}
+
+function hasMeaningfulDiagnosis(value: string) {
+  return (
+    value.replace(/[^\p{L}\p{N}]/gu, '').length >=
+      learningRules.diagnosis.minimumMeaningfulCharacters &&
+    tokenise(value).size > 0
   )
 }
 
@@ -233,6 +242,9 @@ export function evaluateReview(
         learnerFinding,
         evaluation: evaluatePair(learnerFinding, expectedFinding),
       }))
+      .filter(({ learnerFinding }) =>
+        hasMeaningfulDiagnosis(learnerFinding.diagnosis),
+      )
       .filter(
         ({ evaluation }) =>
           evaluation.detection === 1 ||

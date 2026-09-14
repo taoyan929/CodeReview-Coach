@@ -22,19 +22,31 @@ export const router = createBrowserRouter([
       {
         path: 'challenge/:exerciseId',
         loader: async ({ params }) => {
-          const [exercise, exercises, curriculum] = await Promise.all([
-            params.exerciseId
-              ? exerciseRepository.getExercise(params.exerciseId)
-              : null,
-            exerciseRepository.listExercises(),
-            exerciseRepository.getCurriculum(),
-          ])
+          const [exercise, exercises, curriculum, learnerState] =
+            await Promise.all([
+              params.exerciseId
+                ? exerciseRepository.getExercise(params.exerciseId)
+                : null,
+              exerciseRepository.listExercises(),
+              exerciseRepository.getCurriculum(),
+              learnerStateRepository.load(),
+            ])
 
           if (!exercise) {
             throw new Response('Exercise not found', { status: 404 })
           }
 
-          return { exercise, exercises, curriculum }
+          const latestAttempt = learnerState.attempts
+            .filter((attempt) => attempt.exerciseId === exercise.id)
+            .sort((left, right) =>
+              (right.submittedAt ?? '').localeCompare(left.submittedAt ?? ''),
+            )[0]
+          const existingAttempt =
+            latestAttempt?.evaluation && !latestAttempt.completedAt
+              ? latestAttempt
+              : undefined
+
+          return { exercise, exercises, curriculum, existingAttempt }
         },
         element: <ChallengePage />,
         errorElement: <NotFoundPage />,

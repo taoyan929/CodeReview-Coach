@@ -2,7 +2,9 @@
 
 CodeReview Coach is a local-first learning product that helps junior developers practise reading, reviewing, explaining, and fixing code—especially code produced with AI assistance.
 
-The project has completed **M1 Foundation**, **M2 Review Experience**, and the first M3 progress slice. The application now includes a runtime-validated 24-exercise full-stack curriculum, versioned local learner state, complete review-feedback-fix workflow, and deterministic progress dashboard.
+Version **0.1.0** is a release-ready local MVP. It includes a runtime-validated 24-exercise full-stack curriculum, versioned and portable local learner state, the complete review-feedback-fix workflow, deterministic adaptation, and an accessible progress dashboard.
+
+![CodeReview Coach dashboard](docs/assets/dashboard.png)
 
 ## Product idea
 
@@ -27,14 +29,14 @@ Today's Mission
 - Use one learning engine across frontend, backend, API, database, testing, and security tracks.
 - Ship a useful deterministic MVP before adding AI grading or content generation.
 
-## Planned MVP stack
+## MVP stack
 
 - React, TypeScript, and Vite
 - Tailwind CSS
 - Versioned exercise content validated with schemas
 - Deterministic scoring and recommendation engines
 - `localStorage` persistence behind repository interfaces
-- Vitest, React Testing Library, and end-to-end tests
+- Vitest, React Testing Library, Playwright Chromium, and axe
 
 No backend or account is required for the initial MVP.
 
@@ -56,7 +58,29 @@ Quality checks:
 npm run check
 ```
 
-This runs ESLint, the Vitest suite, TypeScript project builds, and the Vite production build.
+This runs formatting, ESLint, 59 unit/integration tests, TypeScript project builds, and the Vite production build. The full release gate also starts the production preview on dedicated port `4174` and runs seven Playwright browser tests:
+
+```bash
+npm run check:release
+```
+
+## Demo flow
+
+![Structured code review workspace](docs/assets/review-workspace.png)
+
+1. Open Today’s Mission and choose a recommended review.
+2. Select independent code lines with a mouse or keyboard, then describe the issue.
+3. Use progressive hints only when needed and submit the review.
+4. Retry from first feedback or reveal the full deterministic breakdown.
+5. Fix the code, compare it with the reference, and return to the updated mission.
+
+The submitted review is restored after refresh. A fix is required before an exercise counts as complete.
+
+## Local data, backup, and recovery
+
+Learner state stays in the current browser’s `localStorage`; no account or network service is required. Dashboard Data Controls can download a JSON backup, validate and restore a backup, or reset progress with confirmation. A failed import never replaces the current state. If stored data is damaged, the error page lets the learner download the original raw value before intentionally resetting the app.
+
+Daily missions, streaks, and weekly goals use the browser’s local calendar day, including local Monday boundaries and daylight-saving transitions.
 
 ## Documentation
 
@@ -82,7 +106,7 @@ Supporting documents:
 - [Contributing guide](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
 
-## Current implementation slice
+## Implemented learning loop
 
 The golden React exercise now supports the complete review-feedback-fix flow:
 
@@ -108,9 +132,9 @@ The same flow now runs across 24 curated exercises covering JavaScript, TypeScri
 
 Planning and execution are tracked in [Linear](https://linear.app/taoyan929/project/codereview-coach-56956b929ac7). Repository documents are the implementation reference; material decisions must be reflected in the matching Linear issue or project document so the two systems do not drift.
 
-## Development status
+## Release status
 
-- Project status: M1 and M2 complete; TAO-23 progress tracking and TAO-25 deterministic adaptation complete
+- Project status: M1–M3 MVP complete; TAO-26 and TAO-30 acceptance audited in Linear; TAO-24 owns the release record
 - M1–M5 milestones: defined
 - Application scaffold: complete
 - Exercise and learner-state contracts: initial version implemented
@@ -121,7 +145,17 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 - Fix practice: editable working copy, learner-gated reference comparison, structured fix submission, and completion transition implemented
 - Progress tracking: separate curriculum completion and mastery, all-track/all-level breakdowns, weak areas, activity history, streaks, daily/weekly goals, unlock states, and reset implemented
 - Adaptive path: explainable 1–3 item Daily Missions use prerequisites, level gates, weak concepts, recent results, hint independence, preferred tracks, difficulty, recency, and mission-format rotation
-- Current recommended work: deepen developer-style missions and Boss Review progression in TAO-26
+- Reliability: atomic backup/restore, raw-data recovery, browser-local calendar semantics, explicit session state machine, and central learning thresholds
+- Accessibility: keyboard line removal, selected-line controls, skip link, visible focus, tab/tabpanel relationships, live status, CTA explanations, contrast checks, and axe coverage
+- Browser quality: Chromium workflows, console/unhandled-error failure policy, and 390/768/1280 horizontal-overflow tests
+
+## Known limitations
+
+- Progress is tied to one browser profile unless a backup is exported and restored elsewhere.
+- Scoring is deterministic and English-oriented; it recognises curated technical aliases but does not yet provide semantic or multilingual AI coaching.
+- Exercises are curated local content. GitHub pull-request import, accounts, cloud sync, and shared progress are intentionally outside the MVP.
+- In-progress form drafts are not persisted. A submitted review is recoverable after refresh; text entered before submission is not.
+- The built-in code editor is designed for short practice snippets, not full repository-scale editing or code execution.
 
 ## License
 

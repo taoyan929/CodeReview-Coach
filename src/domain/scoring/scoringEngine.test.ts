@@ -70,6 +70,18 @@ describe('evaluateReview', () => {
     ])
   })
 
+  it('does not award location-only partial credit to meaningless input', () => {
+    const result = evaluateReview(reactDerivedStateExercise, [
+      finding({ diagnosis: 'x', impact: undefined, suggestedFix: undefined }),
+    ])
+
+    expect(result.technicalScore).toBe(0)
+    expect(result.findingResults.map(({ status }) => status)).toEqual([
+      'missed',
+      'incorrect',
+    ])
+  })
+
   it('keeps communication informational and records hint assistance', () => {
     const conciseResult = evaluateReview(reactDerivedStateExercise, [
       finding({ impact: undefined, suggestedFix: undefined }),

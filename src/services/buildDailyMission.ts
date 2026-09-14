@@ -1,12 +1,14 @@
 import type { Exercise } from '../domain/exercise/types'
 import type { MissionState, Recommendation } from '../domain/learning/types'
+import { calendarDateKey } from '../utils/calendar'
 
 export function buildDailyMission(
   exercises: Exercise[],
   recommendations: Recommendation[],
   date: Date,
+  timeZone?: string,
 ): MissionState {
-  const dateKey = date.toISOString().slice(0, 10)
+  const dateKey = calendarDateKey(date, timeZone)
   const selectedRecommendations = recommendations.slice(0, 3)
   const selectedIds = new Set(
     selectedRecommendations.map(({ exerciseId }) => exerciseId),

@@ -17,6 +17,17 @@ class MemoryLearnerStateRepository implements LearnerStateRepository {
     this.state = state
   }
 
+  async exportBackup() {
+    return JSON.stringify(this.state)
+  }
+  async exportRawData() {
+    return JSON.stringify(this.state)
+  }
+  async restoreBackup(value: string) {
+    this.state = JSON.parse(value) as LearnerState
+    return this.state
+  }
+
   async reset() {
     this.state = createInitialLearnerState()
   }

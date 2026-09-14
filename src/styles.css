@@ -31,6 +31,43 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-mint);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: 9999px;
+  background: var(--color-mint);
+  padding: 0.65rem 1rem;
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Muted copy remains readable at small sizes on the near-black surfaces. */
+.text-paper\/25,
+.text-paper\/30,
+.text-paper\/35,
+.text-paper\/40,
+.text-paper\/45,
+.text-paper\/50,
+.text-paper\/55 {
+  color: rgb(243 240 232 / 0.72);
+}
+
+::placeholder {
+  color: rgb(243 240 232 / 0.65);
+}
+
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 0.72rem;

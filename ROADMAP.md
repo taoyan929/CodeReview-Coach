@@ -1,6 +1,6 @@
 # Roadmap
 
-> Status: In progress · Last reviewed: 2026-09-05
+> Status: MVP complete · Last reviewed: 2026-09-14
 
 ## M1 — Foundation and learning engine
 
@@ -28,9 +28,9 @@ Goal: make the deterministic product useful for repeated daily practice.
 
 - TAO-23 — Track completion, mastery, and weak topics ✅
 - TAO-25 — Implement rule-based recommendations ✅
-- TAO-26 — Add missions, streaks, unlocks, and Boss Reviews
-- TAO-30 — Build Dashboard, Today’s Mission, and Learning Path UI
-- TAO-24 — Test, polish, and prepare the MVP release
+- TAO-26 — Add missions, streaks, unlocks, and Boss Reviews ✅
+- TAO-30 — Build Dashboard, Today’s Mission, and Learning Path UI ✅
+- TAO-24 — Test, polish, and prepare the MVP release ✅
 
 Exit gate: M1–M3 form a complete, accessible, daily-use product. AI is not required for release.
 
@@ -53,4 +53,4 @@ Entry gate: curated content is a reliable baseline, AI Coach quality is measured
 
 ## Delivery rule
 
-Build vertical slices. Stabilise the data contract, then validate one golden exercise through the full learning loop before scaling content or polishing secondary screens. With deterministic adaptation complete, the next recommended slice is TAO-26 developer-style missions and Boss Review progression.
+Build vertical slices. Keep the v0.1.0 deterministic MVP stable while M4 validates where semantic and multilingual coaching adds measurable value. M5 remains gated on reliable curated content and safe server-side integration choices.

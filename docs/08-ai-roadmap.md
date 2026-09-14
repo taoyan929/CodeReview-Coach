@@ -1,4 +1,4 @@
-> Status: Draft · Last reviewed: 2026-09-04 · Imported from [Linear](https://linear.app/taoyan929/document/08-ai-integration-and-product-evolution-roadmap-db98a9b6a509).
+> Status: Post-MVP boundary confirmed · Last reviewed: 2026-09-14 · Imported from [Linear](https://linear.app/taoyan929/document/08-ai-integration-and-product-evolution-roadmap-db98a9b6a509).
 >
 > Repository Markdown is the implementation reference. Material product changes should be reflected in both this document and the matching Linear issue or project document.
 
@@ -202,4 +202,3 @@ Do not move from M3 to AI because AI is fashionable. Move when:
 4. product has enough stable data contracts to evaluate model quality
 
 Do not move to AI-generated curriculum until curated content and recommendation behaviour provide a trustworthy baseline.
-

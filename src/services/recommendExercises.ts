@@ -5,10 +5,13 @@ import type {
 } from '../domain/exercise/types'
 import type { LearnerState, Recommendation } from '../domain/learning/types'
 import type { LearningProgressSnapshot } from './deriveLearningProgress'
+import { learningRules } from '../config/learningRules'
 
-const LOW_SCORE = 65
-const HIGH_SCORE = 85
-const STALE_WEAK_DAYS = 7
+const {
+  lowScore: LOW_SCORE,
+  highScore: HIGH_SCORE,
+  staleWeakDays: STALE_WEAK_DAYS,
+} = learningRules.recommendation
 const LEVEL_ORDER: Record<LearningLevel, number> = {
   literacy: 0,
   'technology-review': 1,

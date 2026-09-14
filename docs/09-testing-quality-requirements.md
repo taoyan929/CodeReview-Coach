@@ -1,4 +1,4 @@
-> Status: Content QA implemented · Last reviewed: 2026-09-05 · Imported from [Linear](https://linear.app/taoyan929/document/09-testing-content-qa-and-non-functional-requirements-bfe6f92c654d).
+> Status: MVP release gate implemented · Last reviewed: 2026-09-14 · Imported from [Linear](https://linear.app/taoyan929/document/09-testing-content-qa-and-non-functional-requirements-bfe6f92c654d).
 >
 > Repository Markdown is the implementation reference. Material product changes should be reflected in both this document and the matching Linear issue or project document.
 
@@ -53,11 +53,18 @@ Critical flows:
 
 ### End-to-end tests
 
-Add once UI stabilises for:
+The Playwright Chromium suite now fails on console errors and unhandled page exceptions and covers:
 
-* first launch → first completed exercise
-* returning user → Today’s Mission
-* multi-file Boss Review
+* first launch and explainable Today’s Mission
+* progressive hint, review submission, retry and final reveal
+* submitted-review recovery after refresh
+* code fix and completion
+* completed Daily Mission summary
+* corrupt local-data recovery
+* axe scans on Dashboard, feedback and recovery surfaces
+* page-level overflow checks at 390px, 768px and 1280px
+
+Run `npm run check:release` before release.
 
 ## 3. Exercise content QA
 
@@ -115,8 +122,9 @@ MVP targets:
 
 * version localStorage schema
 * validate loaded state
-* recover from corrupt/incompatible state without crashing
-* support reset/export later if useful
+* recover from corrupt/incompatible state without silently deleting it
+* validate imports before replacing current state
+* support backup export, restore, raw-data download and confirmed reset
 * exercise IDs stable across content updates
 
 ## 8. Security — MVP

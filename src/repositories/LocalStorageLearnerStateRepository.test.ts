@@ -143,4 +143,40 @@ describe('LocalStorageLearnerStateRepository', () => {
 
     await expect(repository.load()).rejects.toThrow(/unsupported migration/)
   })
+
+  it('exports and restores a validated backup', async () => {
+    const repository = new LocalStorageLearnerStateRepository(
+      window.localStorage,
+      'test-state',
+    )
+    const state = createInitialLearnerState(
+      new Date('2026-09-14T00:00:00.000Z'),
+    )
+    state.profile.preferredTracks = ['react']
+    await repository.save(state)
+    const backup = await repository.exportBackup()
+
+    await repository.reset()
+    const restored = await repository.restoreBackup(backup)
+
+    expect(restored.profile.preferredTracks).toEqual(['react'])
+    expect(await repository.load()).toEqual(restored)
+  })
+
+  it('keeps current state when a backup fails validation', async () => {
+    const repository = new LocalStorageLearnerStateRepository(
+      window.localStorage,
+      'test-state',
+    )
+    const state = createInitialLearnerState(
+      new Date('2026-09-14T00:00:00.000Z'),
+    )
+    await repository.save(state)
+    const before = await repository.exportRawData()
+
+    await expect(
+      repository.restoreBackup('{"schemaVersion":0}'),
+    ).rejects.toThrow(/does not contain valid learner data/)
+    expect(await repository.exportRawData()).toBe(before)
+  })
 })

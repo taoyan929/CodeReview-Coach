@@ -11,24 +11,24 @@ describe('FindingComposer', () => {
     const addButton = screen.getByRole('button', { name: 'Add finding' })
 
     expect(addButton).toHaveAccessibleDescription(
-      'Add finding is unavailable. Select at least one code line and describe what you noticed.',
+      'Add finding is unavailable. Select at least one code line and enter at least 3 meaningful characters.',
     )
 
     fireEvent.mouseEnter(addButton)
     expect(screen.getByRole('status')).toHaveTextContent(
-      'Select at least one code line and describe what you noticed.',
+      'Select at least one code line and enter at least 3 meaningful characters.',
     )
     fireEvent.mouseLeave(addButton)
 
     fireEvent.click(addButton)
     expect(screen.getByRole('status')).toHaveTextContent(
-      'Select at least one code line and describe what you noticed.',
+      'Select at least one code line and enter at least 3 meaningful characters.',
     )
     expect(onAdd).not.toHaveBeenCalled()
 
     rerender(<FindingComposer onAdd={onAdd} selectedLines={[15, 17]} />)
     expect(screen.getByRole('status')).toHaveTextContent(
-      'Describe what you noticed before adding the finding.',
+      'Enter at least 3 meaningful characters describing what you noticed.',
     )
     fireEvent.change(screen.getByLabelText(/What did you notice/), {
       target: { value: 'The derived list becomes stale.' },
@@ -45,5 +45,15 @@ describe('FindingComposer', () => {
       impact: 'New props are ignored.',
       suggestedFix: undefined,
     })
+  })
+
+  it('does not accept a single-character diagnosis', () => {
+    const onAdd = vi.fn()
+    render(<FindingComposer onAdd={onAdd} selectedLines={[2]} />)
+    fireEvent.change(screen.getByLabelText(/What did you notice/), {
+      target: { value: 'x' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Add finding' }))
+    expect(onAdd).not.toHaveBeenCalled()
   })
 })
