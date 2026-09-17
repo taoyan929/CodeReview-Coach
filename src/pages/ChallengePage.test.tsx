@@ -10,6 +10,7 @@ const { submitReviewAttempt } = vi.hoisted(() => ({
   submitReviewAttempt: vi.fn(async (input: SubmitReviewInput) => ({
     id: crypto.randomUUID(),
     exerciseId: input.exercise.id,
+    answerMode: input.answerMode,
     startedAt: input.startedAt,
     submittedAt: '2026-09-05T12:00:00.000Z',
     findings: input.findings,
@@ -60,6 +61,9 @@ function renderChallenge() {
 
 async function addFindingAndFinish(diagnosis: string) {
   fireEvent.click(await screen.findByRole('button', { name: /Select line 1:/ }))
+  fireEvent.change(screen.getByLabelText(/Issue category/), {
+    target: { value: 'logic' },
+  })
   fireEvent.change(screen.getByLabelText(/What did you notice/), {
     target: { value: diagnosis },
   })

@@ -112,9 +112,9 @@ Finding status thresholds are:
 - **Incorrect:** weighted finding score < 0.35
 - **Missed:** no learner finding matches the expected finding
 
-A learner finding can match an expected finding when either its file and line range overlap an accepted location, or its accepted category and diagnosis concept signals are both strong. Expected and learner text is normalised into significant tokens; at least two tokens from a curated concept phrase must match. Exact sentence matching is never required.
+A learner finding can match an expected finding when either its file and line range overlap an accepted location, or its accepted category and diagnosis concept signals are both strong. Full Review normalises expected and learner text into significant tokens and matches curated concept phrases. Language Assist additionally recognises curated compact keyword groups and code operators such as `===`, `!=` and `??`. Exact sentences and correct grammar are never required.
 
-The exercise technical score is the expected-finding-weighted total, reported from 0–100. Communication is calculated and stored separately using diagnosis clarity, impact specificity, and fix actionability; it is never included in the technical score.
+The exercise technical score is the expected-finding-weighted total, reported from 0–100. A correct Language Assist impact choice earns the reasoning dimension; “Not sure yet” earns no reasoning points but does not invalidate the finding. Communication is stored separately: Full Review uses diagnosis clarity, impact specificity and fix actionability, while Language Assist uses only the learner-authored short diagnosis (60%) and fix (40%). It is never included in the technical score.
 
 Assistance level records the strongest hint level divided by three. Review submission does not mark curriculum completion: completion remains pending until the learner performs the fix step introduced by TAO-22.
 
@@ -129,6 +129,8 @@ Record:
 * whether answer was revealed
 
 A learner may complete the exercise after hints, but assistance-independent mastery should increase more slowly than when the same concept is found without help.
+
+Language Assist is a separate support signal rather than a hint. Completion is unchanged, but the final attempt mastery contribution is multiplied by `0.85` after the normal technical, hint and fix calculation.
 
 ## 7. Completion model
 

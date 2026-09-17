@@ -2,54 +2,110 @@ import { fireEvent, render, screen } from '@testing-library/react'
 
 import { FindingComposer } from './FindingComposer'
 
+const impactOptions = [
+  { id: 'impact-a', label: 'The wrong user can gain access.' },
+  { id: 'impact-b', label: 'The label changes colour.' },
+  { id: 'impact-c', label: 'The request becomes faster.' },
+]
+
+function renderComposer(
+  overrides: Partial<React.ComponentProps<typeof FindingComposer>> = {},
+) {
+  const props: React.ComponentProps<typeof FindingComposer> = {
+    answerMode: 'full-review',
+    impactOptions,
+    modeLocked: false,
+    selectedLines: [],
+    onAdd: vi.fn(),
+    onAnswerModeChange: vi.fn(),
+    ...overrides,
+  }
+  const rendered = render(<FindingComposer {...props} />)
+  return { ...rendered, props }
+}
+
 describe('FindingComposer', () => {
-  it('requires a selection and diagnosis before adding a structured finding', () => {
-    const onAdd = vi.fn()
-    const { rerender } = render(
-      <FindingComposer onAdd={onAdd} selectedLines={[]} />,
-    )
+  it('requires a selection, explicit category and diagnosis in full review', () => {
+    const { props, rerender } = renderComposer()
     const addButton = screen.getByRole('button', { name: 'Add finding' })
 
     expect(addButton).toHaveAccessibleDescription(
-      'Add finding is unavailable. Select at least one code line and enter at least 3 meaningful characters.',
+      expect.stringContaining('select at least one code line'),
     )
-
     fireEvent.mouseEnter(addButton)
     expect(screen.getByRole('status')).toHaveTextContent(
-      'Select at least one code line and enter at least 3 meaningful characters.',
+      'choose an issue category',
     )
-    fireEvent.mouseLeave(addButton)
 
-    fireEvent.click(addButton)
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Select at least one code line and enter at least 3 meaningful characters.',
-    )
-    expect(onAdd).not.toHaveBeenCalled()
-
-    rerender(<FindingComposer onAdd={onAdd} selectedLines={[15, 17]} />)
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Enter at least 3 meaningful characters describing what you noticed.',
-    )
+    rerender(<FindingComposer {...props} selectedLines={[15, 17]} />)
+    fireEvent.change(screen.getByLabelText(/Issue category/), {
+      target: { value: 'logic' },
+    })
     fireEvent.change(screen.getByLabelText(/What did you notice/), {
       target: { value: 'The derived list becomes stale.' },
     })
     fireEvent.change(screen.getByLabelText(/Why does it matter/), {
       target: { value: 'New props are ignored.' },
     })
-    expect(addButton).not.toHaveAccessibleDescription()
     fireEvent.click(addButton)
 
-    expect(onAdd).toHaveBeenCalledWith({
+    expect(props.onAdd).toHaveBeenCalledWith({
       category: 'logic',
       diagnosis: 'The derived list becomes stale.',
       impact: 'New props are ignored.',
+      impactOptionId: undefined,
       suggestedFix: undefined,
     })
   })
 
+  it('requires short issue, impact choice and fix in language assist', () => {
+    const onAdd = vi.fn()
+    renderComposer({
+      answerMode: 'language-assist',
+      selectedLines: [2],
+      onAdd,
+    })
+
+    fireEvent.change(screen.getByLabelText(/Issue category/), {
+      target: { value: 'logic' },
+    })
+    fireEvent.change(screen.getByLabelText(/What is the main issue/), {
+      target: { value: 'loose equality' },
+    })
+    fireEvent.click(screen.getByLabelText('Not sure yet'))
+    fireEvent.change(screen.getByLabelText(/How would you fix it/), {
+      target: { value: 'use ===' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Add finding' }))
+
+    expect(onAdd).toHaveBeenCalledWith({
+      category: 'logic',
+      diagnosis: 'loose equality',
+      impact: undefined,
+      impactOptionId: 'not-sure',
+      suggestedFix: 'use ===',
+    })
+  })
+
+  it('locks the mode control after a finding has been added', () => {
+    const onAnswerModeChange = vi.fn()
+    renderComposer({ modeLocked: true, onAnswerModeChange })
+
+    expect(
+      screen.getByRole('button', { name: 'Language assist' }),
+    ).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Full review' })).toBeDisabled()
+    expect(
+      screen.getByText('Remove all findings to change answer mode.'),
+    ).toBeVisible()
+  })
+
   it('does not accept a single-character diagnosis', () => {
     const onAdd = vi.fn()
-    render(<FindingComposer onAdd={onAdd} selectedLines={[2]} />)
+    renderComposer({ selectedLines: [2], onAdd })
+    fireEvent.change(screen.getByLabelText(/Issue category/), {
+      target: { value: 'logic' },
+    })
     fireEvent.change(screen.getByLabelText(/What did you notice/), {
       target: { value: 'x' },
     })

@@ -9,6 +9,7 @@ import { FixCodeStep } from './FixCodeStep'
 const attempt: ExerciseAttempt = {
   id: 'attempt-1',
   exerciseId: reactDerivedStateExercise.id,
+  answerMode: 'full-review',
   startedAt: '2026-09-05T00:00:00.000Z',
   submittedAt: '2026-09-05T00:01:00.000Z',
   findings: [],

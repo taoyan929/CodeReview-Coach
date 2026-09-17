@@ -17,14 +17,19 @@ export function average(values: number[]) {
 
 export function calculateAttemptMastery(attempt: ExerciseAttempt) {
   if (!attempt.evaluation) return undefined
+  const answerModeMultiplier =
+    attempt.answerMode === 'language-assist'
+      ? learningRules.answerModes.languageAssistMasteryMultiplier
+      : 1
   return Math.max(
     0,
     Math.min(
       100,
       round(
-        attempt.evaluation.technicalScore * 0.75 +
+        (attempt.evaluation.technicalScore * 0.75 +
           (1 - attempt.evaluation.assistanceLevel) * 10 +
-          (attempt.fixSubmission && attempt.completedAt ? 15 : 0),
+          (attempt.fixSubmission && attempt.completedAt ? 15 : 0)) *
+          answerModeMultiplier,
       ),
     ),
   )

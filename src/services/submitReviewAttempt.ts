@@ -1,4 +1,4 @@
-import type { Exercise } from '../domain/exercise/types'
+import type { AnswerMode, Exercise } from '../domain/exercise/types'
 import type {
   ExerciseAttempt,
   HintUsage,
@@ -12,6 +12,7 @@ export interface SubmitReviewInput {
   startedAt: string
   findings: LearnerFinding[]
   hintsUsed: HintUsage[]
+  answerMode: AnswerMode
 }
 
 export async function submitReviewAttempt(
@@ -29,11 +30,19 @@ export async function submitReviewAttempt(
   const attempt: ExerciseAttempt = {
     id: createId(),
     exerciseId: input.exercise.id,
+    answerMode: input.answerMode,
     startedAt: input.startedAt,
     submittedAt,
     findings: input.findings,
     hintsUsed: input.hintsUsed,
-    evaluation: evaluateReview(input.exercise, input.findings, input.hintsUsed),
+    evaluation: evaluateReview(
+      input.exercise,
+      input.findings,
+      input.hintsUsed,
+      {
+        answerMode: input.answerMode,
+      },
+    ),
   }
 
   await learnerStateRepository.save({

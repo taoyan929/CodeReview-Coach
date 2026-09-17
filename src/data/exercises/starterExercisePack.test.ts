@@ -73,6 +73,14 @@ describe('starterExercisePack', () => {
         const lineCount = file?.content.split('\n').length ?? 0
 
         expect(finding.hints.map(({ level }) => level)).toEqual([1, 2, 3])
+        expect(finding.diagnosisKeywordGroups?.length).toBeGreaterThan(0)
+        expect(finding.fixKeywordGroups?.length).toBeGreaterThan(0)
+        expect(finding.acceptedImpactOptionIds).toHaveLength(1)
+        expect(
+          exercise.answerSupport?.impactOptions.some(({ id }) =>
+            finding.acceptedImpactOptionIds?.includes(id),
+          ),
+        ).toBe(true)
         for (const location of finding.acceptedLocations) {
           expect(location.startLine).toBeLessThanOrEqual(lineCount)
           expect(location.endLine ?? location.startLine).toBeLessThanOrEqual(
@@ -80,6 +88,13 @@ describe('starterExercisePack', () => {
           )
         }
       }
+
+      expect(
+        new Set(exercise.answerSupport?.impactOptions.map(({ id }) => id)).size,
+      ).toBe(exercise.answerSupport?.impactOptions.length)
+      expect(exercise.answerSupport?.impactOptions.length).toBe(
+        exercise.expectedFindings.length * 3,
+      )
     }
   })
 

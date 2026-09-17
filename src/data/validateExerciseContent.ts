@@ -31,6 +31,15 @@ export function validateExerciseContent(exercise: Exercise) {
   }
 
   const fileMap = new Map(exercise.files.map((file) => [file.id, file]))
+  const impactOptionIds = new Set(
+    exercise.answerSupport?.impactOptions.map(({ id }) => id) ?? [],
+  )
+  if (impactOptionIds.size < 3) {
+    throw new Error(
+      `Exercise ${exercise.id} requires at least three language-assist impact options`,
+    )
+  }
+
   for (const finding of exercise.expectedFindings) {
     const file = fileMap.get(finding.fileId)
     const lineCount = file?.content.split('\n').length ?? 0
@@ -48,6 +57,24 @@ export function validateExerciseContent(exercise: Exercise) {
     if (hintLevels.join(',') !== '1,2,3') {
       throw new Error(
         `Exercise ${exercise.id} finding ${finding.id} requires hint levels 1,2,3`,
+      )
+    }
+
+    if (
+      !finding.diagnosisKeywordGroups?.length ||
+      !finding.fixKeywordGroups?.length
+    ) {
+      throw new Error(
+        `Exercise ${exercise.id} finding ${finding.id} requires short-answer keyword groups`,
+      )
+    }
+
+    if (
+      !finding.acceptedImpactOptionIds?.length ||
+      finding.acceptedImpactOptionIds.some((id) => !impactOptionIds.has(id))
+    ) {
+      throw new Error(
+        `Exercise ${exercise.id} finding ${finding.id} requires a valid accepted impact option`,
       )
     }
   }

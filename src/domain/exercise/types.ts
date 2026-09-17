@@ -50,6 +50,15 @@ export const issueCategories = [
 
 export type IssueCategory = (typeof issueCategories)[number]
 
+export const answerModes = ['language-assist', 'full-review'] as const
+
+export type AnswerMode = (typeof answerModes)[number]
+
+export interface ImpactOption {
+  id: string
+  label: string
+}
+
 export interface CodeLocation {
   startLine: number
   endLine?: number
@@ -86,8 +95,11 @@ export interface ExpectedFinding {
   acceptedCategories?: IssueCategory[]
   concepts: string[]
   diagnosisAliases?: string[]
+  diagnosisKeywordGroups?: string[][]
   reasoningConcepts?: string[]
   fixConcepts?: string[]
+  fixKeywordGroups?: string[][]
+  acceptedImpactOptionIds?: string[]
   severity: 'low' | 'medium' | 'high' | 'critical'
   weight: number
   hints: Hint[]
@@ -132,6 +144,9 @@ export interface Exercise {
   missionType: MissionType
   estimatedMinutes: number
   requirement: ExerciseRequirement
+  answerSupport?: {
+    impactOptions: ImpactOption[]
+  }
   files: CodeFile[]
   expectedFindings: ExpectedFinding[]
   hints: Hint[]

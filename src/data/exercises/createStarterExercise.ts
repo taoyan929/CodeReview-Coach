@@ -18,9 +18,95 @@ export interface StarterFindingSpec {
   diagnosis: string
   reasoning: string
   fix: string
+  impactDistractors: [string, string]
+  diagnosisKeywordGroups?: string[][]
+  fixKeywordGroups?: string[][]
   severity: 'low' | 'medium' | 'high' | 'critical'
   explanation: string
   referenceComment: string
+}
+
+const nonDistinctiveAnswerWords = new Set([
+  'a',
+  'an',
+  'and',
+  'are',
+  'be',
+  'before',
+  'can',
+  'code',
+  'data',
+  'does',
+  'error',
+  'every',
+  'for',
+  'from',
+  'function',
+  'has',
+  'in',
+  'inside',
+  'is',
+  'it',
+  'not',
+  'of',
+  'on',
+  'only',
+  'or',
+  'query',
+  'request',
+  'response',
+  'result',
+  'return',
+  'the',
+  'this',
+  'to',
+  'test',
+  'use',
+  'used',
+  'user',
+  'value',
+  'values',
+  'when',
+  'with',
+  'without',
+  'wrong',
+])
+
+function keywordGroups(phrase: string) {
+  const groups =
+    phrase
+      .match(/!==|===|==|!=|\?\?|[a-zA-Z][a-zA-Z0-9_]*/g)
+      ?.map((token) => token.toLowerCase())
+      .filter((token) => !nonDistinctiveAnswerWords.has(token))
+      .map((token) => [token]) ?? []
+
+  if (phrase.toLowerCase().includes('strict equality')) {
+    groups.push(['==='])
+  }
+  if (phrase.toLowerCase().includes('nullish')) {
+    groups.push(['??'])
+  }
+
+  return [...new Map(groups.map((group) => [group.join(' '), group])).values()]
+}
+
+function answerSupportForFinding(finding: StarterFindingSpec) {
+  const correctIndex =
+    [...finding.id].reduce(
+      (total, character) => total + character.charCodeAt(0),
+      0,
+    ) % 3
+  const labels = [...finding.impactDistractors]
+  labels.splice(correctIndex, 0, finding.reasoning)
+  const options = labels.map((label, index) => ({
+    id: `${finding.id}-impact-${String.fromCharCode(97 + index)}`,
+    label: label.charAt(0).toUpperCase() + label.slice(1) + '.',
+  }))
+
+  return {
+    options,
+    acceptedOptionId: options[correctIndex]!.id,
+  }
 }
 
 export interface StarterExerciseSpec {
@@ -132,22 +218,36 @@ function evaluationCases(spec: StarterExerciseSpec) {
 }
 
 export function createStarterExercise(spec: StarterExerciseSpec): Exercise {
-  const expectedFindings = spec.findings.map((finding) => ({
-    id: finding.id,
-    fileId: finding.fileId,
-    acceptedLocations: finding.locations,
-    category: finding.category,
-    acceptedCategories: finding.acceptedCategories,
-    concepts: finding.concepts,
-    diagnosisAliases: [finding.diagnosis],
-    reasoningConcepts: [finding.reasoning],
-    fixConcepts: [finding.fix],
-    severity: finding.severity,
-    weight: finding.severity === 'critical' ? 2 : 1,
-    hints: findingHints(finding),
-    explanation: finding.explanation,
-    referenceComment: finding.referenceComment,
-  }))
+  const supportByFinding = new Map(
+    spec.findings.map((finding) => [
+      finding.id,
+      answerSupportForFinding(finding),
+    ]),
+  )
+  const expectedFindings = spec.findings.map((finding) => {
+    const support = supportByFinding.get(finding.id)!
+
+    return {
+      id: finding.id,
+      fileId: finding.fileId,
+      acceptedLocations: finding.locations,
+      category: finding.category,
+      acceptedCategories: finding.acceptedCategories,
+      concepts: finding.concepts,
+      diagnosisAliases: [finding.diagnosis],
+      diagnosisKeywordGroups:
+        finding.diagnosisKeywordGroups ?? keywordGroups(finding.diagnosis),
+      reasoningConcepts: [finding.reasoning],
+      fixConcepts: [finding.fix],
+      fixKeywordGroups: finding.fixKeywordGroups ?? keywordGroups(finding.fix),
+      acceptedImpactOptionIds: [support.acceptedOptionId],
+      severity: finding.severity,
+      weight: finding.severity === 'critical' ? 2 : 1,
+      hints: findingHints(finding),
+      explanation: finding.explanation,
+      referenceComment: finding.referenceComment,
+    }
+  })
 
   return {
     id: spec.id,
@@ -162,6 +262,11 @@ export function createStarterExercise(spec: StarterExerciseSpec): Exercise {
     missionType: spec.missionType,
     estimatedMinutes: spec.estimatedMinutes,
     requirement: spec.requirement,
+    answerSupport: {
+      impactOptions: [...supportByFinding.values()].flatMap(
+        ({ options }) => options,
+      ),
+    },
     files: spec.files,
     expectedFindings,
     hints: expectedFindings[0]?.hints.slice(0, 1) ?? [],

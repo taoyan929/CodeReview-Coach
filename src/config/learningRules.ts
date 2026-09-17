@@ -25,4 +25,8 @@ export const learningRules = {
   diagnosis: {
     minimumMeaningfulCharacters: 3,
   },
+  answerModes: {
+    languageAssistMasteryMultiplier: 0.85,
+    shortAnswerTargetTokens: 3,
+  },
 } as const

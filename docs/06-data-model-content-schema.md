@@ -65,6 +65,9 @@ interface Exercise {
   missionType: MissionType;
   estimatedMinutes: number;
   requirement: ExerciseRequirement;
+  answerSupport?: {
+    impactOptions: Array<{ id: string; label: string }>;
+  };
   files: CodeFile[];
   expectedFindings: ExpectedFinding[];
   hints: Hint[];
@@ -115,8 +118,11 @@ interface ExpectedFinding {
   acceptedCategories?: IssueCategory[];
   concepts: string[];
   diagnosisAliases?: string[];
+  diagnosisKeywordGroups?: string[][];
   reasoningConcepts?: string[];
   fixConcepts?: string[];
+  fixKeywordGroups?: string[][];
+  acceptedImpactOptionIds?: string[];
   severity: 'low' | 'medium' | 'high' | 'critical';
   weight: number;
   hints: Hint[];
@@ -156,12 +162,13 @@ interface LearnerFinding {
   category?: IssueCategory;
   diagnosis: string;
   impact?: string;
+  impactOptionId?: string;
   suggestedFix?: string;
   createdAt: string;
 }
 ```
 
-`locations` stores one or more independently selected lines/ranges. This allows a single review finding to reference non-adjacent lines without treating every intervening line as selected. Learner-state schema version 3 migrates the former singular `location` field into a one-item `locations` array. Version 4 adds persisted recommendation metadata to each Daily Mission and migrates active version 3 missions with a legacy reason before they are refreshed by the Dashboard loader.
+`locations` stores one or more independently selected lines/ranges. This allows a single review finding to reference non-adjacent lines without treating every intervening line as selected. Learner-state schema version 3 migrates the former singular `location` field into a one-item `locations` array. Version 4 adds persisted recommendation metadata to each Daily Mission. Version 5 records the answer mode and migrates historical attempts to `full-review`.
 
 Advanced mode may omit category and use a free-form comment while mapping into the same model.
 
@@ -171,6 +178,7 @@ Advanced mode may omit category and use a free-form comment while mapping into t
 interface ExerciseAttempt {
   id: string;
   exerciseId: string;
+  answerMode: 'language-assist' | 'full-review';
   startedAt: string;
   submittedAt?: string;
   completedAt?: string;

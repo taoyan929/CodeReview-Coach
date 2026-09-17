@@ -43,8 +43,11 @@ const expectedFindingSchema = z.object({
   acceptedCategories: z.array(z.enum(issueCategories)).optional(),
   concepts: z.array(z.string().min(1)).min(1),
   diagnosisAliases: z.array(z.string().min(1)).optional(),
+  diagnosisKeywordGroups: z.array(z.array(z.string().min(1)).min(1)).optional(),
   reasoningConcepts: z.array(z.string().min(1)).optional(),
   fixConcepts: z.array(z.string().min(1)).optional(),
+  fixKeywordGroups: z.array(z.array(z.string().min(1)).min(1)).optional(),
+  acceptedImpactOptionIds: z.array(z.string().min(1)).min(1).optional(),
   severity: z.enum(['low', 'medium', 'high', 'critical']),
   weight: z.number().positive(),
   hints: z.array(hintSchema),
@@ -93,6 +96,18 @@ export const exerciseSchema = z
       constraints: z.array(z.string().min(1)).optional(),
       incidentContext: z.string().min(1).optional(),
     }),
+    answerSupport: z
+      .object({
+        impactOptions: z
+          .array(
+            z.object({
+              id: z.string().min(1),
+              label: z.string().min(1),
+            }),
+          )
+          .min(3),
+      })
+      .optional(),
     files: z.array(codeFileSchema).min(1),
     expectedFindings: z.array(expectedFindingSchema).min(1),
     hints: z.array(hintSchema),
@@ -108,6 +123,20 @@ export const exerciseSchema = z
     const expectedFindingIds = new Set(
       exercise.expectedFindings.map((finding) => finding.id),
     )
+    const impactOptionIds = new Set(
+      exercise.answerSupport?.impactOptions.map(({ id }) => id) ?? [],
+    )
+
+    if (
+      impactOptionIds.size !==
+      (exercise.answerSupport?.impactOptions.length ?? 0)
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Language-assist impact option ids must be unique',
+        path: ['answerSupport', 'impactOptions'],
+      })
+    }
 
     for (const finding of exercise.expectedFindings) {
       if (!fileIds.has(finding.fileId)) {
@@ -116,6 +145,16 @@ export const exerciseSchema = z
           message: `Expected finding ${finding.id} references unknown file ${finding.fileId}`,
           path: ['expectedFindings'],
         })
+      }
+
+      for (const optionId of finding.acceptedImpactOptionIds ?? []) {
+        if (!impactOptionIds.has(optionId)) {
+          context.addIssue({
+            code: 'custom',
+            message: `Expected finding ${finding.id} references unknown impact option ${optionId}`,
+            path: ['expectedFindings'],
+          })
+        }
       }
     }
 

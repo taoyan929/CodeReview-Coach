@@ -58,7 +58,7 @@ Quality checks:
 npm run check
 ```
 
-This runs formatting, ESLint, 59 unit/integration tests, TypeScript project builds, and the Vite production build. The full release gate also starts the production preview on dedicated port `4174` and runs seven Playwright browser tests:
+This runs formatting, ESLint, 66 unit/integration tests, TypeScript project builds, and the Vite production build. The full release gate also starts the production preview on dedicated port `4174` and runs seven Playwright browser tests:
 
 ```bash
 npm run check:release
@@ -69,7 +69,7 @@ npm run check:release
 ![Structured code review workspace](docs/assets/review-workspace.png)
 
 1. Open Today’s Mission and choose a recommended review.
-2. Select independent code lines with a mouse or keyboard, then describe the issue.
+2. Select independent code lines with a mouse or keyboard, then describe the issue. Code Literacy starts in Language Assist, where short English issue/fix phrases and a consequence choice replace a full impact paragraph.
 3. Use progressive hints only when needed and submit the review.
 4. Retry from first feedback or reveal the full deterministic breakdown.
 5. Fix the code, compare it with the reference, and return to the updated mission.
@@ -141,7 +141,8 @@ Planning and execution are tracked in [Linear](https://linear.app/taoyan929/proj
 - Curriculum: 24 curated exercises, 100-point built-in path, all 10 MVP tracks, all 3 learning levels, and all 8 mission formats
 - Content quality: startup schema/QA validation plus 96 embedded golden scoring cases covering strong, poor-English-but-correct, partial, and incorrect responses
 - Structured review workspace: independent line selection, guided findings, progressive hints, multiple comments, submission, retry, and local attempt persistence implemented
-- Deterministic scoring: finding-level technical dimensions, separate communication score, assistance tracking, staged feedback, and final reveal implemented
+- Language Assist: available in every exercise, defaulted on for Code Literacy, with curated consequence choices, compact technical-keyword scoring, retry persistence, and an 85% mastery contribution
+- Deterministic scoring: finding-level technical dimensions, separate full/short-answer communication scores, assistance tracking, staged feedback, and final reveal implemented
 - Fix practice: editable working copy, learner-gated reference comparison, structured fix submission, and completion transition implemented
 - Progress tracking: separate curriculum completion and mastery, all-track/all-level breakdowns, weak areas, activity history, streaks, daily/weekly goals, unlock states, and reset implemented
 - Adaptive path: explainable 1–3 item Daily Missions use prerequisites, level gates, weak concepts, recent results, hint independence, preferred tracks, difficulty, recency, and mission-format rotation

@@ -34,6 +34,93 @@ interface CompactExerciseSpec {
   severity: 'low' | 'medium' | 'high' | 'critical'
 }
 
+const impactDistractorsByExercise: Record<string, [string, string]> = {
+  'javascript-strict-equality-01': [
+    'every valid administrator is rejected by the permission check',
+    'the navigation label is displayed with the wrong capitalisation',
+  ],
+  'javascript-map-return-01': [
+    'the source prices are sorted into a different order',
+    'the tax calculation is applied twice to every price',
+  ],
+  'typescript-optional-name-01': [
+    'the Anonymous fallback is shown for every profile',
+    'the display name is converted to lowercase before rendering',
+  ],
+  'typescript-unsafe-assertion-01': [
+    'TypeScript validates the response twice at runtime',
+    'valid responses are rejected because their id is a string',
+  ],
+  'react-index-key-01': [
+    'the list cannot render when the items array is empty',
+    'sorting permanently changes the order stored on the server',
+  ],
+  'react-effect-cleanup-01': [
+    'the timer runs only once and then stops permanently',
+    'the counter state resets before every timer tick',
+  ],
+  'python-mutable-default-01': [
+    'all tags are discarded immediately after each function call',
+    'a caller-provided tag list can no longer be updated',
+  ],
+  'python-broad-exception-01': [
+    'missing profile files always crash the whole application',
+    'valid profile JSON is parsed twice for every request',
+  ],
+  'fastapi-delete-status-01': [
+    'the delete operation is executed twice for the same user',
+    'existing users always receive a 404 response',
+  ],
+  'fastapi-blocking-sleep-01': [
+    'only the delayed request pauses while other requests continue',
+    'the sleep automatically retries the failed background operation',
+  ],
+  'rest-post-status-01': [
+    'the newly created resource is immediately rolled back',
+    'the client request body is submitted to the server twice',
+  ],
+  'rest-pagination-limit-01': [
+    'small result pages are rejected even when the limit is valid',
+    'the endpoint silently sorts all results in descending order',
+  ],
+  'sql-null-comparison-01': [
+    'deleted rows are included in the active result set',
+    'the query changes deleted_at while it reads the rows',
+  ],
+  'sql-update-without-where-01': [
+    'only account 42 remains unchanged after the update',
+    'the statement creates duplicate account records',
+  ],
+  'sql-n-plus-one-01': [
+    'orders are assigned to the wrong user in the response',
+    'the application never opens a database connection',
+  ],
+  'nosql-unbounded-query-01': [
+    'the newest events are always omitted from the response',
+    'the tenant filter is removed from the database query',
+  ],
+  'cosmos-partition-key-01': [
+    'the operation modifies an order belonging to another tenant',
+    'Cosmos DB generates a new item id during the read',
+  ],
+  'testing-error-path-01': [
+    'checkout declines every valid payment in production',
+    'the mocked gateway charges a real payment method',
+  ],
+  'testing-missing-await-01': [
+    'the test always times out before its first statement runs',
+    'the rejected promise is automatically converted into a success',
+  ],
+  'security-hardcoded-secret-01': [
+    'all JWT tokens expire immediately after they are created',
+    'the JWT library cannot sign tokens in development',
+  ],
+  'security-object-authorization-01': [
+    'administrators cannot load their own profile',
+    'profiles are returned in the wrong sort order',
+  ],
+}
+
 const code = (...lines: string[]) => lines.join('\n')
 
 function compactExercise(spec: CompactExerciseSpec) {
@@ -41,6 +128,11 @@ function compactExercise(spec: CompactExerciseSpec) {
   const locations = Array.isArray(spec.line)
     ? [{ startLine: spec.line[0], endLine: spec.line[1] }]
     : [{ startLine: spec.line }]
+  const impactDistractors = impactDistractorsByExercise[spec.id]
+
+  if (!impactDistractors) {
+    throw new Error(`Missing language-assist impact options for ${spec.id}`)
+  }
 
   return createStarterExercise({
     id: spec.id,
@@ -81,6 +173,7 @@ function compactExercise(spec: CompactExerciseSpec) {
         diagnosis: spec.diagnosis,
         reasoning: spec.reasoning,
         fix: spec.fix,
+        impactDistractors,
         severity: spec.severity,
         explanation:
           spec.diagnosis.charAt(0).toUpperCase() +
@@ -902,6 +995,10 @@ const fullStackContractBoss = createStarterExercise({
         'the backend returns name while the frontend reads displayName',
       reasoning: 'the contract mismatch renders an undefined profile name',
       fix: 'return displayName from the backend response',
+      impactDistractors: [
+        'the backend rejects every valid profile request',
+        'the profile name is permanently changed in the database',
+      ],
       severity: 'critical',
       explanation:
         'The frontend and backend use different public field names, so valid data disappears at the boundary.',
@@ -919,6 +1016,10 @@ const fullStackContractBoss = createStarterExercise({
       reasoning:
         'a breaking response field rename passes the current test suite',
       fix: 'assert the exact displayName response contract',
+      impactDistractors: [
+        'the test can no longer connect to the API server',
+        'the endpoint always returns a 500 response during testing',
+      ],
       severity: 'high',
       explanation:
         'A status-only test cannot detect schema drift across the frontend and backend.',
@@ -1010,6 +1111,10 @@ const orderTransactionReview = createStarterExercise({
         'the order is persisted before payment without rollback on failure',
       reasoning: 'a charge exception leaves an unpaid order committed',
       fix: 'use a transaction or compensate by rolling back the order',
+      impactDistractors: [
+        'every successful payment is charged twice',
+        'successful orders are always removed after payment',
+      ],
       severity: 'critical',
       explanation:
         'The operations form one business outcome, so the failure path must not commit only the database half.',
@@ -1025,6 +1130,10 @@ const orderTransactionReview = createStarterExercise({
       diagnosis: 'the tests omit the payment failure and rollback path',
       reasoning: 'the partial write regression passes a success only suite',
       fix: 'simulate a charge failure and assert no order remains',
+      impactDistractors: [
+        'the test submits a real payment to the provider',
+        'the success path fails before an order can be created',
+      ],
       severity: 'high',
       explanation:
         'The incident occurs only on failure, so success-only coverage cannot verify atomic behaviour.',

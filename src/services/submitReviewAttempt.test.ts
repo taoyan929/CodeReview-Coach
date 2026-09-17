@@ -43,6 +43,7 @@ describe('submitReviewAttempt', () => {
     const attempt = await submitReviewAttempt(
       {
         exercise: reactDerivedStateExercise,
+        answerMode: 'full-review',
         startedAt: '2026-09-05T00:01:00.000Z',
         findings: [
           {
@@ -80,6 +81,7 @@ describe('submitReviewAttempt', () => {
       submitReviewAttempt(
         {
           exercise: reactDerivedStateExercise,
+          answerMode: 'full-review',
           startedAt: '2026-09-05T00:01:00.000Z',
           findings: [],
           hintsUsed: [],

@@ -111,16 +111,20 @@ Code interaction:
 ### Beginner finding composer
 
 * selected line(s)
-* Issue Type dropdown
-* “What did you notice?”
-* “Why does it matter?” optional
-* “Suggested fix” optional
+* explicit Issue Type selection
+* required short-English “What is the main issue?” response
+* one of three curated “What could happen?” choices, plus “Not sure yet”
+* required short-English “How would you fix it?” response
+* Language Assist enabled by default for Code Literacy
+
+Language Assist remains available as an explicit toggle at later levels, where Full Review is the default. Grammar does not affect technical scoring. Once a finding is added, the answer mode is locked until all findings are removed so one attempt cannot mix scoring modes.
 
 ### Intermediate finding composer
 
 * selected line(s)
 * free-form review comment
 * optional Category Hint / Concept Hint / Strong Hint
+* optional Language Assist toggle with reduced mastery contribution
 
 ### Advanced / PR mode
 

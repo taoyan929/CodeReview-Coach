@@ -46,6 +46,7 @@ function scoredAttempt(
   return {
     id: 'attempt-1',
     exerciseId: 'intro',
+    answerMode: 'full-review',
     startedAt: '2026-09-05T08:00:00.000Z',
     submittedAt: '2026-09-05T08:05:00.000Z',
     findings: [],

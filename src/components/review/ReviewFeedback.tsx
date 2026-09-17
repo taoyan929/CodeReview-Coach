@@ -8,6 +8,8 @@ import type {
 } from '../../domain/learning/types'
 import { formatCodeLocations } from '../../utils/formatCodeLocations'
 import { formatLabel } from '../../utils/formatLabel'
+import { calculateAttemptMastery } from '../../services/learningProgress/mastery'
+import { NOT_SURE_IMPACT_OPTION_ID } from './FindingComposer'
 
 interface ReviewFeedbackProps {
   exercise: Exercise
@@ -46,6 +48,8 @@ export function ReviewFeedback({
 }: ReviewFeedbackProps) {
   const [showFinalFeedback, setShowFinalFeedback] = useState(false)
   const evaluation = attempt.evaluation
+  const isLanguageAssist = attempt.answerMode === 'language-assist'
+  const masteryContribution = calculateAttemptMastery(attempt) ?? 0
 
   if (!evaluation) {
     throw new Error('Submitted review has no deterministic evaluation')
@@ -65,7 +69,14 @@ export function ReviewFeedback({
   if (!showFinalFeedback) {
     return (
       <div className="mx-auto max-w-4xl px-6 py-12 lg:px-10 lg:py-16">
-        <p className="eyebrow">First feedback</p>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="eyebrow">First feedback</p>
+          {isLanguageAssist && (
+            <span className="rounded-full border border-mint/25 bg-mint/[0.06] px-3 py-1 font-mono text-[10px] text-mint uppercase">
+              Language assist used
+            </span>
+          )}
+        </div>
         <h1 className="mt-4 text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">
           Your review has been evaluated.
         </h1>
@@ -174,6 +185,15 @@ export function ReviewFeedback({
         Technical understanding and communication are reported separately.
         Communication quality never lowers the technical score.
       </p>
+      {isLanguageAssist && (
+        <div className="mt-5 max-w-3xl rounded-2xl border border-mint/20 bg-mint/[0.06] px-5 py-4 text-sm leading-6 text-mint/90">
+          <p className="font-semibold">Review submitted with language assist</p>
+          <p className="mt-1 text-paper/60">
+            Grammar did not affect your technical score. This attempt
+            contributes 85% of the usual mastery signal.
+          </p>
+        </div>
+      )}
 
       <section className="mt-10 grid gap-4 sm:grid-cols-3">
         <FeedbackMetric
@@ -182,12 +202,12 @@ export function ReviewFeedback({
           value={`${evaluation.technicalScore}%`}
         />
         <FeedbackMetric
-          label="Communication"
+          label={isLanguageAssist ? 'Short-answer clarity' : 'Communication'}
           value={`${evaluation.communicationScore ?? 0}%`}
         />
         <FeedbackMetric
-          label="Completion"
-          value={evaluation.completed ? 'Complete' : 'Fix pending'}
+          label="Mastery contribution"
+          value={`${masteryContribution}%`}
         />
       </section>
 
@@ -210,6 +230,19 @@ export function ReviewFeedback({
                 return null
               }
 
+              const selectedImpactOption =
+                learnerFinding?.impactOptionId === NOT_SURE_IMPACT_OPTION_ID
+                  ? undefined
+                  : exercise.answerSupport?.impactOptions.find(
+                      ({ id }) => id === learnerFinding?.impactOptionId,
+                    )
+              const selectedImpactIsCorrect = Boolean(
+                learnerFinding?.impactOptionId &&
+                expectedFinding.acceptedImpactOptionIds?.includes(
+                  learnerFinding.impactOptionId,
+                ),
+              )
+
               return (
                 <article
                   className="rounded-3xl border border-white/10 bg-white/[0.035] p-6"
@@ -231,6 +264,31 @@ export function ReviewFeedback({
                     <p className="mt-4 border-l-2 border-white/10 pl-4 text-sm leading-6 text-paper/60">
                       {learnerFinding.diagnosis}
                     </p>
+                  )}
+
+                  {isLanguageAssist && learnerFinding && (
+                    <div className="mt-4 rounded-2xl border border-white/10 bg-ink/40 p-4">
+                      <p className="font-mono text-[9px] text-paper/35 uppercase">
+                        Selected impact
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-paper/65">
+                        {selectedImpactOption?.label ?? 'Not sure yet'}
+                      </p>
+                      <p
+                        className={`mt-2 text-xs leading-5 ${
+                          selectedImpactIsCorrect
+                            ? 'text-mint/80'
+                            : 'text-amber-100/70'
+                        }`}
+                      >
+                        {selectedImpactIsCorrect
+                          ? 'This consequence matches the issue.'
+                          : learnerFinding.impactOptionId ===
+                              NOT_SURE_IMPACT_OPTION_ID
+                            ? 'Impact analysis is your next practice step; the finding can still be technically strong.'
+                            : 'This consequence does not follow from the selected issue. Compare it with the explanation below.'}
+                      </p>
+                    </div>
                   )}
 
                   <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-5">

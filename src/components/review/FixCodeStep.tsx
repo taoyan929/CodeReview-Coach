@@ -236,6 +236,11 @@ function FixComparison({
             <p className="mt-2 text-sm text-paper/55">
               Review submitted · feedback revealed · fix submitted
             </p>
+            {attempt.answerMode === 'language-assist' && (
+              <p className="mt-2 text-xs text-mint/75">
+                Completed with language assist · 85% mastery weighting
+              </p>
+            )}
           </div>
           <p className="font-mono text-xs text-paper/40">
             Technical review · {attempt.evaluation?.technicalScore ?? 0}%

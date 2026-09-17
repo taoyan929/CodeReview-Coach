@@ -13,6 +13,7 @@ function attempt(overrides: Partial<ExerciseAttempt> = {}): ExerciseAttempt {
   return {
     id: 'attempt-1',
     exerciseId: reactDerivedStateExercise.id,
+    answerMode: 'full-review',
     startedAt: '2026-09-05T00:00:00.000Z',
     submittedAt: '2026-09-05T00:01:00.000Z',
     findings: [],
@@ -60,6 +61,29 @@ function completedAttemptFor(
 }
 
 describe('deriveLearningProgress', () => {
+  it('discounts language-assist mastery without changing technical scoring', () => {
+    const fullReview = attempt({
+      completedAt: '2026-09-05T00:02:00.000Z',
+      fixSubmission: {
+        files: reactDerivedStateExercise.files,
+        submittedAt: '2026-09-05T00:02:00.000Z',
+      },
+      evaluation: {
+        ...attempt().evaluation!,
+        technicalScore: 100,
+        completed: true,
+      },
+    })
+    const languageAssist = {
+      ...fullReview,
+      answerMode: 'language-assist' as const,
+    }
+
+    expect(calculateAttemptMastery(fullReview)).toBe(100)
+    expect(calculateAttemptMastery(languageAssist)).toBe(85)
+    expect(languageAssist.evaluation?.technicalScore).toBe(100)
+  })
+
   it('shows every planned track and learning level before there is activity', () => {
     const progress = progressFor(createInitialLearnerState())
 

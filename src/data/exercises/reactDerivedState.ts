@@ -79,6 +79,22 @@ export const reactDerivedStateExercise: Exercise = {
       'Do not add an effect solely to mirror props into state.',
     ],
   },
+  answerSupport: {
+    impactOptions: [
+      {
+        id: 'derived-state-impact-a',
+        label: 'The list becomes stale when tasks or the query changes.',
+      },
+      {
+        id: 'derived-state-impact-b',
+        label: 'The component sends duplicate requests to the server.',
+      },
+      {
+        id: 'derived-state-impact-c',
+        label: 'Every task is permanently removed after the first render.',
+      },
+    ],
+  },
   files: [
     {
       id: 'task-list',
@@ -101,11 +117,22 @@ export const reactDerivedStateExercise: Exercise = {
         'visibleTasks becomes stale when props change',
         'the filtered list is derived from props',
       ],
+      diagnosisKeywordGroups: [
+        ['stale'],
+        ['derived', 'state'],
+        ['initial', 'value'],
+      ],
       reasoningConcepts: [
         'state initializer runs only on the initial render',
         'props can change after the initial render',
       ],
       fixConcepts: ['calculate visibleTasks during render', 'remove useState'],
+      fixKeywordGroups: [
+        ['render'],
+        ['remove', 'usestate'],
+        ['calculate', 'visibletasks'],
+      ],
+      acceptedImpactOptionIds: ['derived-state-impact-a'],
       severity: 'high',
       weight: 1,
       hints: [

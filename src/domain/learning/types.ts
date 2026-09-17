@@ -6,6 +6,7 @@ import type {
   IssueCategory,
   LearningLevel,
   Track,
+  AnswerMode,
 } from '../exercise/types'
 
 export interface LearnerProfile {
@@ -22,6 +23,7 @@ export interface LearnerFinding {
   category?: IssueCategory
   diagnosis: string
   impact?: string
+  impactOptionId?: string
   suggestedFix?: string
   createdAt: string
 }
@@ -62,6 +64,7 @@ export interface EvaluationResult {
 export interface ExerciseAttempt {
   id: string
   exerciseId: Exercise['id']
+  answerMode: AnswerMode
   startedAt: string
   submittedAt?: string
   completedAt?: string
@@ -163,7 +166,7 @@ export interface LearnerStateRepository {
   reset(): Promise<void>
 }
 
-export const LEARNER_STATE_SCHEMA_VERSION = 4
+export const LEARNER_STATE_SCHEMA_VERSION = 5
 
 export function createInitialLearnerState(now = new Date()): LearnerState {
   const timestamp = now.toISOString()

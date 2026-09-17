@@ -131,6 +131,35 @@ describe('LocalStorageLearnerStateRepository', () => {
     ])
   })
 
+  it('migrates version 4 attempts to full review mode', async () => {
+    const currentState = createInitialLearnerState(
+      new Date('2026-09-05T00:00:00.000Z'),
+    )
+    const legacyState = {
+      ...currentState,
+      schemaVersion: 4,
+      attempts: [
+        {
+          id: 'attempt-1',
+          exerciseId: 'react-derived-state-01',
+          startedAt: '2026-09-05T00:00:00.000Z',
+          findings: [],
+          hintsUsed: [],
+        },
+      ],
+    }
+    window.localStorage.setItem('test-state', JSON.stringify(legacyState))
+    const repository = new LocalStorageLearnerStateRepository(
+      window.localStorage,
+      'test-state',
+    )
+
+    const migratedState = await repository.load()
+
+    expect(migratedState.schemaVersion).toBe(LEARNER_STATE_SCHEMA_VERSION)
+    expect(migratedState.attempts[0]?.answerMode).toBe('full-review')
+  })
+
   it('rejects unsupported state instead of silently resetting it', async () => {
     window.localStorage.setItem(
       'test-state',

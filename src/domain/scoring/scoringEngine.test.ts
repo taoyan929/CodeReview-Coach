@@ -1,4 +1,5 @@
 import { reactDerivedStateExercise } from '../../data/exercises/reactDerivedState'
+import { starterExercisePack } from '../../data/exercises/starterExercisePack'
 import type { LearnerFinding } from '../learning/types'
 import { evaluateReview, TECHNICAL_DIMENSION_WEIGHTS } from './scoringEngine'
 
@@ -103,5 +104,99 @@ describe('evaluateReview', () => {
     )
     expect(detailedResult.assistanceLevel).toBe(0.67)
     expect(detailedResult.completed).toBe(false)
+  })
+
+  it('accepts compact technical English and operators in language assist', () => {
+    const exercise = starterExercisePack.find(
+      ({ id }) => id === 'javascript-strict-equality-01',
+    )!
+    const expectedFinding = exercise.expectedFindings[0]!
+    const result = evaluateReview(
+      exercise,
+      [
+        {
+          id: 'short-finding',
+          fileId: expectedFinding.fileId,
+          locations: [{ startLine: 2 }],
+          category: 'logic',
+          diagnosis: 'coercion',
+          impactOptionId: 'not-sure',
+          suggestedFix: 'use ===',
+          createdAt: '2026-09-05T00:00:00.000Z',
+        },
+      ],
+      [],
+      { answerMode: 'language-assist' },
+    )
+
+    expect(result.technicalScore).toBe(85)
+    expect(result.findingResults[0]).toMatchObject({
+      detection: 1,
+      category: 1,
+      diagnosis: 1,
+      reasoning: 0,
+      fix: 1,
+      status: 'strong',
+    })
+  })
+
+  it('scores a supported impact choice without treating it as authored communication', () => {
+    const exercise = starterExercisePack.find(
+      ({ id }) => id === 'javascript-strict-equality-01',
+    )!
+    const expectedFinding = exercise.expectedFindings[0]!
+    const correctImpactId = expectedFinding.acceptedImpactOptionIds![0]!
+    const baseFinding: LearnerFinding = {
+      id: 'short-finding',
+      fileId: expectedFinding.fileId,
+      locations: [{ startLine: 2 }],
+      category: 'logic',
+      diagnosis: 'loose equality coercion',
+      suggestedFix: 'use ===',
+      createdAt: '2026-09-05T00:00:00.000Z',
+    }
+    const unsure = evaluateReview(
+      exercise,
+      [{ ...baseFinding, impactOptionId: 'not-sure' }],
+      [],
+      { answerMode: 'language-assist' },
+    )
+    const correct = evaluateReview(
+      exercise,
+      [{ ...baseFinding, impactOptionId: correctImpactId }],
+      [],
+      { answerMode: 'language-assist' },
+    )
+
+    expect(correct.technicalScore).toBe(100)
+    expect(correct.findingResults[0]?.reasoning).toBe(1)
+    expect(correct.communicationScore).toBe(unsure.communicationScore)
+  })
+
+  it('does not let a generic short answer pass by guessing an impact', () => {
+    const exercise = starterExercisePack.find(
+      ({ id }) => id === 'javascript-strict-equality-01',
+    )!
+    const expectedFinding = exercise.expectedFindings[0]!
+    const result = evaluateReview(
+      exercise,
+      [
+        {
+          id: 'guess',
+          fileId: expectedFinding.fileId,
+          locations: [{ startLine: 2 }],
+          category: 'logic',
+          diagnosis: 'wrong code',
+          impactOptionId: expectedFinding.acceptedImpactOptionIds![0],
+          suggestedFix: 'good code',
+          createdAt: '2026-09-05T00:00:00.000Z',
+        },
+      ],
+      [],
+      { answerMode: 'language-assist' },
+    )
+
+    expect(result.technicalScore).toBeLessThan(75)
+    expect(result.findingResults[0]?.status).toBe('partial')
   })
 })

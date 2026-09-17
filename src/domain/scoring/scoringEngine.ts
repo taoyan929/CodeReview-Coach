@@ -1,4 +1,9 @@
-import type { CodeLocation, Exercise, ExpectedFinding } from '../exercise/types'
+import type {
+  AnswerMode,
+  CodeLocation,
+  Exercise,
+  ExpectedFinding,
+} from '../exercise/types'
 import type {
   EvaluationResult,
   FindingEvaluation,
@@ -53,13 +58,24 @@ function roundDimension(value: number) {
   return Math.round(value * 100) / 100
 }
 
+function normaliseToken(token: string) {
+  if (token.length > 4 && token.endsWith('ies')) {
+    return `${token.slice(0, -3)}y`
+  }
+  if (token.length > 3 && token.endsWith('s') && !token.endsWith('ss')) {
+    return token.slice(0, -1)
+  }
+  return token
+}
+
 function tokenise(value: string) {
+  const operatorAwareValue = value
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .toLowerCase()
+
   return new Set(
-    value
-      .toLowerCase()
-      .replace(/([a-z])([A-Z])/g, '$1 $2')
-      .replace(/[^a-z0-9]+/g, ' ')
-      .split(/\s+/)
+    (operatorAwareValue.match(/!==|===|==|!=|\?\?|[a-z0-9]+/g) ?? [])
+      .map(normaliseToken)
       .filter((token) => token.length > 1 && !stopWords.has(token)),
   )
 }
@@ -95,6 +111,22 @@ function phraseMatchScore(input: string, phrases: string[]) {
       }),
     ),
   )
+}
+
+function keywordGroupMatchScore(input: string, groups: string[][] = []) {
+  const inputTokens = tokenise(input)
+
+  if (inputTokens.size === 0) return 0
+
+  return groups.some((group) => {
+    const requiredTokens = tokenise(group.join(' '))
+    return (
+      requiredTokens.size > 0 &&
+      [...requiredTokens].every((token) => inputTokens.has(token))
+    )
+  })
+    ? 1
+    : 0
 }
 
 function locationsOverlap(left: CodeLocation, right: CodeLocation) {
@@ -137,17 +169,38 @@ function categoryScore(
 function diagnosisScore(
   learnerFinding: LearnerFinding,
   expectedFinding: ExpectedFinding,
+  answerMode: AnswerMode,
 ) {
-  return phraseMatchScore(learnerFinding.diagnosis, [
+  const phraseScore = phraseMatchScore(learnerFinding.diagnosis, [
     ...expectedFinding.concepts,
     ...(expectedFinding.diagnosisAliases ?? []),
   ])
+
+  return answerMode === 'language-assist'
+    ? Math.max(
+        phraseScore,
+        keywordGroupMatchScore(
+          learnerFinding.diagnosis,
+          expectedFinding.diagnosisKeywordGroups,
+        ),
+      )
+    : phraseScore
 }
 
 function reasoningScore(
   learnerFinding: LearnerFinding,
   expectedFinding: ExpectedFinding,
+  answerMode: AnswerMode,
 ) {
+  if (answerMode === 'language-assist') {
+    return learnerFinding.impactOptionId &&
+      expectedFinding.acceptedImpactOptionIds?.includes(
+        learnerFinding.impactOptionId,
+      )
+      ? 1
+      : 0
+  }
+
   return phraseMatchScore(
     `${learnerFinding.diagnosis} ${learnerFinding.impact ?? ''}`,
     expectedFinding.reasoningConcepts ?? [],
@@ -157,17 +210,39 @@ function reasoningScore(
 function fixScore(
   learnerFinding: LearnerFinding,
   expectedFinding: ExpectedFinding,
+  answerMode: AnswerMode,
 ) {
-  return phraseMatchScore(
+  const phraseScore = phraseMatchScore(
     learnerFinding.suggestedFix ?? '',
     expectedFinding.fixConcepts ?? [],
   )
+
+  return answerMode === 'language-assist'
+    ? Math.max(
+        phraseScore,
+        keywordGroupMatchScore(
+          learnerFinding.suggestedFix ?? '',
+          expectedFinding.fixKeywordGroups,
+        ),
+      )
+    : phraseScore
 }
 
-function communicationScore(learnerFinding: LearnerFinding) {
+function communicationScore(
+  learnerFinding: LearnerFinding,
+  answerMode: AnswerMode,
+) {
   const diagnosisWords = tokenise(learnerFinding.diagnosis).size
   const impactWords = tokenise(learnerFinding.impact ?? '').size
   const fixWords = tokenise(learnerFinding.suggestedFix ?? '').size
+
+  if (answerMode === 'language-assist') {
+    const target = learningRules.answerModes.shortAnswerTargetTokens
+    const clarity = Math.min(1, diagnosisWords / target) * 0.6
+    const actionability = Math.min(1, fixWords / target) * 0.4
+    return roundDimension(clarity + actionability)
+  }
+
   const clarity = Math.min(1, diagnosisWords / 8) * 0.5
   const specificity = Math.min(1, impactWords / 6) * 0.25
   const actionability = Math.min(1, fixWords / 6) * 0.25
@@ -187,16 +262,17 @@ function technicalFindingScore(evaluation: FindingEvaluation) {
 function evaluatePair(
   learnerFinding: LearnerFinding,
   expectedFinding: ExpectedFinding,
+  answerMode: AnswerMode,
 ): FindingEvaluation {
   const evaluation: FindingEvaluation = {
     learnerFindingId: learnerFinding.id,
     expectedFindingId: expectedFinding.id,
     detection: detectionScore(learnerFinding, expectedFinding),
     category: categoryScore(learnerFinding, expectedFinding),
-    diagnosis: diagnosisScore(learnerFinding, expectedFinding),
-    reasoning: reasoningScore(learnerFinding, expectedFinding),
-    fix: fixScore(learnerFinding, expectedFinding),
-    communication: communicationScore(learnerFinding),
+    diagnosis: diagnosisScore(learnerFinding, expectedFinding, answerMode),
+    reasoning: reasoningScore(learnerFinding, expectedFinding, answerMode),
+    fix: fixScore(learnerFinding, expectedFinding, answerMode),
+    communication: communicationScore(learnerFinding, answerMode),
     status: 'incorrect',
   }
   const technicalScore = technicalFindingScore(evaluation)
@@ -223,7 +299,9 @@ export function evaluateReview(
   exercise: Exercise,
   learnerFindings: LearnerFinding[],
   hintsUsed: HintUsage[] = [],
+  options: { answerMode?: AnswerMode } = {},
 ): EvaluationResult {
+  const answerMode = options.answerMode ?? 'full-review'
   const unmatchedLearnerFindings = new Map(
     learnerFindings.map((finding) => [finding.id, finding]),
   )
@@ -240,7 +318,7 @@ export function evaluateReview(
     const candidates = [...unmatchedLearnerFindings.values()]
       .map((learnerFinding) => ({
         learnerFinding,
-        evaluation: evaluatePair(learnerFinding, expectedFinding),
+        evaluation: evaluatePair(learnerFinding, expectedFinding, answerMode),
       }))
       .filter(({ learnerFinding }) =>
         hasMeaningfulDiagnosis(learnerFinding.diagnosis),
@@ -290,7 +368,7 @@ export function evaluateReview(
       diagnosis: 0,
       reasoning: 0,
       fix: 0,
-      communication: communicationScore(learnerFinding),
+      communication: communicationScore(learnerFinding, answerMode),
       status: 'incorrect',
     })
   }

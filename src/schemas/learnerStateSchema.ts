@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import {
+  answerModes,
   issueCategories,
   learningLevels,
   tracks,
@@ -55,6 +56,7 @@ const learnerFindingSchema = z.object({
   category: z.enum(issueCategories).optional(),
   diagnosis: z.string(),
   impact: z.string().optional(),
+  impactOptionId: z.string().optional(),
   suggestedFix: z.string().optional(),
   createdAt: z.iso.datetime(),
 })
@@ -62,6 +64,7 @@ const learnerFindingSchema = z.object({
 const attemptSchema = z.object({
   id: z.string().min(1),
   exerciseId: z.string().min(1),
+  answerMode: z.enum(answerModes),
   startedAt: z.iso.datetime(),
   submittedAt: z.iso.datetime().optional(),
   completedAt: z.iso.datetime().optional(),
@@ -204,10 +207,20 @@ export function migrateLearnerState(input: unknown): LearnerState {
         }
       : input.dailyMission
 
+    return migrateLearnerState({
+      ...input,
+      schemaVersion: 4,
+      dailyMission,
+    })
+  }
+
+  if (input.schemaVersion === 4 && Array.isArray(input.attempts)) {
     return parseLearnerState({
       ...input,
       schemaVersion: LEARNER_STATE_SCHEMA_VERSION,
-      dailyMission,
+      attempts: input.attempts.map((attempt) =>
+        isRecord(attempt) ? { ...attempt, answerMode: 'full-review' } : attempt,
+      ),
     })
   }
 

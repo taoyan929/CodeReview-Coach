@@ -48,18 +48,19 @@ test('review, hint, retry, refresh recovery and code fix form a complete loop', 
     .getByRole('link', { name: /continue today|start next challenge/i })
     .click()
   await expectNoSeriousA11yViolations(page)
+  await expect(
+    page.getByRole('button', { name: 'Language assist' }),
+  ).toHaveAttribute('aria-pressed', 'true')
   await page.getByRole('button', { name: /get hint 1/i }).click()
   await page.getByRole('button', { name: /select line 2:/i }).click()
+  await page.getByLabel(/issue category/i).selectOption('logic')
   await page
-    .getByLabel(/what did you notice/i)
-    .fill('Loose equality allows type coercion.')
-  await page
-    .getByLabel(/why does it matter/i)
-    .fill('A coerced role could pass an authorization check.')
-  await page
-    .getByLabel(/suggested fix/i)
-    .fill('Use strict equality for the role comparison.')
+    .getByLabel(/what is the main issue/i)
+    .fill('loose equality coercion')
+  await page.getByLabel(/coerced role values can pass/i).check()
+  await page.getByLabel(/how would you fix it/i).fill('use ===')
   await page.getByRole('button', { name: 'Add finding' }).click()
+  await expect(page.getByRole('button', { name: 'Full review' })).toBeDisabled()
   await page.getByRole('button', { name: /finish review/i }).click()
   await expect(page.getByRole('heading', { name: /evaluated/i })).toBeVisible()
 
@@ -67,12 +68,18 @@ test('review, hint, retry, refresh recovery and code fix form a complete loop', 
   await expect(page.getByRole('heading', { name: /evaluated/i })).toBeVisible()
   await page.getByRole('button', { name: 'Try again' }).click()
   await page.getByRole('button', { name: /select line 2:/i }).click()
+  await page.getByLabel(/issue category/i).selectOption('logic')
   await page
-    .getByLabel(/what did you notice/i)
-    .fill('Loose equality allows type coercion.')
+    .getByLabel(/what is the main issue/i)
+    .fill('loose equality coercion')
+  await page.getByLabel('Not sure yet').check()
+  await page.getByLabel(/how would you fix it/i).fill('use ===')
   await page.getByRole('button', { name: 'Add finding' }).click()
   await page.getByRole('button', { name: /finish review/i }).click()
   await page.getByRole('button', { name: /finish & reveal/i }).click()
+  await expect(
+    page.getByText(/grammar did not affect your technical score/i),
+  ).toBeVisible()
   await expectNoSeriousA11yViolations(page)
   await page.getByRole('button', { name: /fix the code/i }).click()
   await page

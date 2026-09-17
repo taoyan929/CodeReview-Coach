@@ -9,7 +9,7 @@ import {
 } from '../components/review/FindingComposer'
 import { FindingList } from '../components/review/FindingList'
 import { ReviewFeedback } from '../components/review/ReviewFeedback'
-import type { Curriculum, Exercise } from '../domain/exercise/types'
+import type { AnswerMode, Curriculum, Exercise } from '../domain/exercise/types'
 import type {
   ExerciseAttempt,
   HintUsage,
@@ -31,6 +31,7 @@ type SessionPhase = 'reviewing' | 'feedback' | 'fixing' | 'complete'
 
 interface ReviewSessionState {
   phase: SessionPhase
+  answerMode: AnswerMode
   activeFileId: string
   selectedLines: number[]
   findings: LearnerFinding[]
@@ -43,6 +44,7 @@ interface ReviewSessionState {
 
 type ReviewSessionAction =
   | { type: 'select-file'; fileId: string }
+  | { type: 'set-answer-mode'; answerMode: AnswerMode }
   | { type: 'select-lines'; lines: number[] }
   | { type: 'add-finding'; finding: LearnerFinding }
   | { type: 'remove-finding'; findingId: string }
@@ -66,6 +68,10 @@ function reviewSessionReducer(
   switch (action.type) {
     case 'select-file':
       return { ...state, activeFileId: action.fileId, selectedLines: [] }
+    case 'set-answer-mode':
+      return state.findings.length > 0
+        ? state
+        : { ...state, answerMode: action.answerMode }
     case 'select-lines':
       return { ...state, selectedLines: action.lines }
     case 'add-finding':
@@ -96,6 +102,7 @@ function reviewSessionReducer(
     case 'retry':
       return {
         phase: 'reviewing',
+        answerMode: state.answerMode,
         activeFileId: action.fileId,
         selectedLines: [],
         findings: [],
@@ -117,6 +124,9 @@ export function ChallengePage() {
     useLoaderData() as ChallengeLoaderData
   const [session, dispatch] = useReducer(reviewSessionReducer, {
     phase: existingAttempt ? 'feedback' : 'reviewing',
+    answerMode:
+      existingAttempt?.answerMode ??
+      (exercise.level === 'literacy' ? 'language-assist' : 'full-review'),
     activeFileId: exercise.files[0]?.id ?? '',
     selectedLines: [],
     findings: existingAttempt?.findings ?? [],
@@ -127,6 +137,7 @@ export function ChallengePage() {
   })
   const {
     activeFileId,
+    answerMode,
     selectedLines,
     findings,
     hintsUsed,
@@ -137,6 +148,22 @@ export function ChallengePage() {
   } = session
 
   const activeFile = exercise.files.find(({ id }) => id === activeFileId)
+  const impactOptionFindingIndex = exercise.expectedFindings.findIndex(
+    (finding) =>
+      finding.fileId === activeFileId &&
+      selectedLines.some((line) =>
+        finding.acceptedLocations.some(
+          ({ startLine, endLine = startLine }) =>
+            line >= startLine && line <= endLine,
+        ),
+      ),
+  )
+  const impactOptionStart = Math.max(0, impactOptionFindingIndex) * 3
+  const visibleImpactOptions =
+    exercise.answerSupport?.impactOptions.slice(
+      impactOptionStart,
+      impactOptionStart + 3,
+    ) ?? []
   const progressiveHints = useMemo(() => {
     const findingHints = exercise.expectedFindings.flatMap(({ hints }) => hints)
     return findingHints.length > 0 ? findingHints : exercise.hints
@@ -190,6 +217,7 @@ export function ChallengePage() {
           startedAt,
           findings,
           hintsUsed,
+          answerMode,
         },
         learnerStateRepository,
       )
@@ -417,7 +445,20 @@ export function ChallengePage() {
         </section>
 
         <aside className="min-w-0 space-y-6">
-          <FindingComposer onAdd={addFinding} selectedLines={selectedLines} />
+          <FindingComposer
+            answerMode={answerMode}
+            impactOptions={visibleImpactOptions}
+            key={answerMode}
+            modeLocked={findings.length > 0}
+            onAdd={addFinding}
+            onAnswerModeChange={(nextAnswerMode) =>
+              dispatch({
+                type: 'set-answer-mode',
+                answerMode: nextAnswerMode,
+              })
+            }
+            selectedLines={selectedLines}
+          />
 
           <section>
             <div className="flex items-center justify-between gap-4">
